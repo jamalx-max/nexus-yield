@@ -1,0 +1,29 @@
+---
+id: 0
+name: Apex Yield Testnet Deployment
+network: testnet
+stacks-node: "https://api.testnet.hiro.so"
+bitcoin-node: "https://blockstream.info/testnet/api"
+
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - contract-publish:
+            contract-name: sip-010-trait
+            expected-sender: $DEPLOYER
+            cost: 10000
+            path: contracts/sip-010-trait.clar
+            clarity-version: 4
+        - contract-publish:
+            contract-name: mock-usdcx
+            expected-sender: $DEPLOYER
+            cost: 15000
+            path: contracts/mock-usdcx.clar
+            clarity-version: 4
+        - contract-publish:
+            contract-name: apex-vault
+            expected-sender: $DEPLOYER
+            cost: 25000
+            path: contracts/apex-vault.clar
+            clarity-version: 4
