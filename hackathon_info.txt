@@ -1,0 +1,37 @@
+Programming USDCx on Stacks - Builder Challenge
+Welcome to the Programming USDCx on Stacks Builder Challenge! This event runs from January 19 to January 25, 2026, and takes place entirely online. Brought to you by Stacks Labs, this challenge focuses on unleashing the creative potential of the global developer community to integrate USDCx on Stacks via a programmatic bridge.
+
+USDCx on Stacks opens up stablecoin liquidity into its decentralized ecosystem via Circle's xReserve protocol. This enables asset transfers from Ethereum and enhances Stacks' DeFi offerings. Users access Stacks' DeFi, maintaining stable assets, increasing liquidity, and providing a reliable option for transactions and investments.
+
+Deposits are initiated on Ethereum and automatically minted on Stacks, while withdrawals are initiated on Stacks and settled on Ethereum. The bridging process is powered by Circle’s xReserve and the Stacks attestation service.
+
+Our primary goal is to encourage developers to build groundbreaking applications and integrations powered by USDCx, helping to bring liquidity from Ethereum to Stacks. With a $3,000 USD cash prize (winner-takes-all) and no track divisions, all types of ideas competing head-to-head in one open category!
+
+Time Schedule
+Hackathon Kickoff: January 19, 2026 (00:00 UTC)
+Submission Deadline: January 25, 2026 (23:59 UTC)
+Judging Period: January 26–29, 2026
+Winner Announcement: January 30, 2026
+Support
+Throughout the week, we will also be providing technical support via our Skool community. Be sure to join Stackers to keep up with challenge updates and to ask any questions you may have during the course of the hackathon. We will have developer support monitoring this community for technical questions during the entire week of the challenge.
+
+https://www.skool.com/stackers/about
+
+Submission Method and Rules
+To compete for the $3,000 prize, each team must:
+
+Register via the official DoraHacks event page.
+Submit a GitHub repository containing all source code for the project.
+Deliver a working, accessible demo showcasing USDCx integration on Stacks.
+Create a short video pitch explaining the project, the integration approach, and its potential impact.
+Teams may include any number of members. All entries must be original and developed within the challenge timeframe. (IMPORTANT: Only the USDCx integration itself needs to be implemented within the timeframe of the challenge. You are free to integrate with an existing project that you have or create a brand new one for this challenge.
+Submissions will be judged holistically on:
+Technical innovation and complexity
+Integration depth with USDCx & Stacks
+Usability and practicality of the demo
+Presentation and clarity of the pitch video
+Potential for the project to turn into a real product on Stacks
+Note: Only one prize will be awarded.
+
+Other Resources
+For this challenge, learning how to bridge USDC over to Stacks will be essential. We have created a guide for you follow here: https://docs.stacks.co/more-guides/bridging-usdcx
