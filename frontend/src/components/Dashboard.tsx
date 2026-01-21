@@ -1,30 +1,28 @@
-import { TrendingUp, ArrowRight, Wallet, RefreshCw } from 'lucide-react';
+import { TrendingUp, ArrowRight, Wallet, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Skeleton } from './ui/skeleton';
 import { useState } from 'react';
 import { formatUSD, formatPercent, formatNumber } from '../lib/utils';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useAccount } from 'wagmi';
+import { useVaultData } from '../hooks';
+import { ZapFlow } from './ZapFlow';
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
   const { isConnected: stacksConnected } = useStacksWallet();
   const { isConnected: ethConnected } = useAccount();
 
-  // Mock data (will be replaced with real data)
-  const vaultData = {
-    totalAssets: 1_250_000,
-    exchangeRate: 1.135,
-    userShares: stacksConnected ? 10_000 : 0,
-    userAssets: stacksConnected ? 11_350 : 0,
-    apy: 13.5,
-  };
+  // Use real vault data from the Stacks contract
+  const vaultData = useVaultData();
 
+  // Competition rates for comparison
   const rates = {
     aave: 4.2,
-    apex: 13.5,
-    advantage: 9.3,
+    apex: vaultData.apy,
+    advantage: vaultData.apy - 4.2,
   };
 
   return (
@@ -49,7 +47,11 @@ export function Dashboard() {
           <ArrowRight className="h-8 w-8 text-primary" />
           <div className="text-center">
             <p className="text-primary text-sm font-medium">Apex Yield (Stacks)</p>
-            <p className="text-4xl font-number text-accent font-bold glow-accent">{formatPercent(rates.apex)}</p>
+            {vaultData.isLoading ? (
+              <Skeleton className="h-10 w-24 mx-auto" />
+            ) : (
+              <p className="text-4xl font-number text-accent font-bold glow-accent">{formatPercent(rates.apex)}</p>
+            )}
           </div>
         </div>
         <p className="text-sm text-accent">
@@ -62,30 +64,53 @@ export function Dashboard() {
         <Card className="glass">
           <CardHeader className="pb-2">
             <CardDescription>Total Value Locked</CardDescription>
-            <CardTitle className="text-2xl font-number">
-              {formatUSD(vaultData.totalAssets)}
-            </CardTitle>
+            {vaultData.isLoading ? (
+              <Skeleton className="h-8 w-32" />
+            ) : (
+              <CardTitle className="text-2xl font-number">
+                {formatUSD(vaultData.totalAssets)}
+              </CardTitle>
+            )}
           </CardHeader>
         </Card>
         
         <Card className="glass">
           <CardHeader className="pb-2">
             <CardDescription>Exchange Rate</CardDescription>
-            <CardTitle className="text-2xl font-number">
-              1 apUSDCx = {formatNumber(vaultData.exchangeRate, 4)} USDCx
-            </CardTitle>
+            {vaultData.isLoading ? (
+              <Skeleton className="h-8 w-40" />
+            ) : (
+              <CardTitle className="text-2xl font-number">
+                1 apUSDCx = {formatNumber(vaultData.exchangeRate, 4)} USDCx
+              </CardTitle>
+            )}
           </CardHeader>
         </Card>
         
         <Card className="glass">
           <CardHeader className="pb-2">
             <CardDescription>Current APY</CardDescription>
-            <CardTitle className="text-2xl font-number text-accent">
-              {formatPercent(vaultData.apy)}
-            </CardTitle>
+            {vaultData.isLoading ? (
+              <Skeleton className="h-8 w-20" />
+            ) : (
+              <CardTitle className="text-2xl font-number text-accent">
+                {formatPercent(vaultData.apy)}
+              </CardTitle>
+            )}
           </CardHeader>
         </Card>
       </div>
+
+      {/* Error State */}
+      {vaultData.error && (
+        <Card className="max-w-md mx-auto border-destructive/50 bg-destructive/5">
+          <CardContent className="pt-4">
+            <p className="text-sm text-destructive text-center">
+              Unable to fetch vault data. Using cached values.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Deposit Card */}
       <Card className="max-w-md mx-auto">
@@ -116,18 +141,20 @@ export function Dashboard() {
           </div>
 
           {stacksConnected ? (
-            <Button className="w-full" variant="success" size="lg">
-              <TrendingUp className="h-4 w-4 mr-2" />
+            <Button className="w-full" variant="success" size="lg" disabled={vaultData.isLoading}>
+              {vaultData.isLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <TrendingUp className="h-4 w-4 mr-2" />
+              )}
               Deposit
             </Button>
           ) : ethConnected ? (
             <div className="space-y-2">
-              <Button className="w-full" variant="default" size="lg">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Bridge & Deposit (Zap)
-              </Button>
+              {/* Zap Flow - Bridge from Ethereum */}
+              <ZapFlow />
               <p className="text-xs text-muted-foreground text-center">
-                One-click bridge from Ethereum USDC
+                One-click bridge from Ethereum USDC via Circle xReserve
               </p>
             </div>
           ) : (
