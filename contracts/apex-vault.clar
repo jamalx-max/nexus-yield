@@ -1,42 +1,42 @@
-;; Apex Yield Vault
-;; A yield-bearing vault for USDCx on Stacks
-;; Implements SIP-010 for the share token (apUSDCx)
+;; title: apex-vault
+;; version: 1.0.0
+;; summary: Apex Yield Vault - Yield-bearing vault for USDCx
+;; description: A DeFi vault that accepts USDCx deposits and issues apUSDCx share tokens.
+;;              Implements block-based yield simulation for demo purposes.
+;;              Written for Clarity 4 with asset restriction safety.
 
+;; traits
+;;
 (impl-trait .sip-010-trait.sip-010-trait)
 
-;; Error codes
-(define-constant ERR-ZERO-AMOUNT (err u1001))
-
-;; Constants
-;; Target: 10 bps per 100 blocks
-(define-constant YIELD-RATE-BPS u10) 
-(define-constant BLOCKS-PER-ACCRUE u100)
-
-;; External Contracts
-;; For local dev, we point to our mock. 
-;; For testnet, we will swap this or use the real address if we deploy dependency.
-;; Real Testnet: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx
-;; Local: .mock-usdcx
-;; Note: Using literal contract reference for compatibility
-
-;; Token Definitions
+;; token definitions
+;;
 (define-fungible-token ap-usdcx)
 
-;; Data Vars
+;; constants
+;;
+(define-constant ERR-ZERO-AMOUNT (err u1001))
+(define-constant ERR-NOT-TOKEN-OWNER (err u100))
+
+;; Yield parameters: 10 basis points per 100 blocks (~13.5% APY at 10min blocks)
+(define-constant YIELD-RATE-BPS u10)
+(define-constant BLOCKS-PER-ACCRUE u100)
+
+;; data vars
+;;
 (define-data-var total-assets uint u0)
-(define-data-var last-accrue-block uint u0)
+(define-data-var last-accrue-block uint stacks-block-height)
 
-;; Initialize
-(begin
-  (var-set last-accrue-block block-height)
-)
+;; data maps
+;;
 
-;; --- Internal Logic ---
+;; private functions
+;;
 
-;; Accrue yield based on simulated time (returns nothing, just updates state)
+;; Accrue yield based on elapsed blocks
 (define-private (accrue-yield-internal)
   (let (
-    (current-block block-height)
+    (current-block stacks-block-height)
     (last-block (var-get last-accrue-block))
     (blocks-elapsed (- current-block last-block))
     (periods (/ blocks-elapsed BLOCKS-PER-ACCRUE))
@@ -44,7 +44,7 @@
     (if (> periods u0)
       (let (
         (assets (var-get total-assets))
-        ;; Yield = assets * periods * 10 / 10000
+        ;; Yield = assets * periods * YIELD-RATE-BPS / 10000
         (yield-amount (/ (* assets (* periods YIELD-RATE-BPS)) u10000))
       )
         (var-set total-assets (+ assets yield-amount))
@@ -56,21 +56,25 @@
   )
 )
 
-;; --- Read-Only Functions ---
+;; read only functions
+;;
 
+;; Get total assets in vault
 (define-read-only (get-total-assets)
   (var-get total-assets)
 )
 
+;; Get current exchange rate (assets per share, 6 decimals)
 (define-read-only (get-exchange-rate)
   (let ((supply (ft-get-supply ap-usdcx)))
     (if (is-eq supply u0)
-      u1000000 ;; 1.0 (6 decimals)
+      u1000000 ;; 1.0 with 6 decimals
       (/ (* (var-get total-assets) u1000000) supply)
     )
   )
 )
 
+;; Preview shares received for deposit amount
 (define-read-only (preview-deposit (amount uint))
   (let ((supply (ft-get-supply ap-usdcx)))
     (if (is-eq supply u0)
@@ -80,6 +84,7 @@
   )
 )
 
+;; Preview assets received for share amount
 (define-read-only (preview-withdraw (shares uint))
   (let ((supply (ft-get-supply ap-usdcx)))
     (if (is-eq supply u0)
@@ -89,27 +94,66 @@
   )
 )
 
+;; Get last accrue block
 (define-read-only (get-last-accrue-block)
   (var-get last-accrue-block)
 )
 
-;; --- Public Functions ---
+;; Get contract principal (Clarity 4)
+(define-read-only (get-vault-principal)
+  current-contract
+)
 
+;; SIP-010: Get name
+(define-read-only (get-name)
+  (ok "Apex Yield USDC")
+)
+
+;; SIP-010: Get symbol
+(define-read-only (get-symbol)
+  (ok "apUSDCx")
+)
+
+;; SIP-010: Get decimals
+(define-read-only (get-decimals)
+  (ok u6)
+)
+
+;; SIP-010: Get balance
+(define-read-only (get-balance (who principal))
+  (ok (ft-get-balance ap-usdcx who))
+)
+
+;; SIP-010: Get total supply
+(define-read-only (get-total-supply)
+  (ok (ft-get-supply ap-usdcx))
+)
+
+;; SIP-010: Get token URI
+(define-read-only (get-token-uri)
+  (ok none)
+)
+
+;; public functions
+;;
+
+;; Deposit USDCx and receive apUSDCx shares
 (define-public (deposit (amount uint))
   (let (
     (shares (preview-deposit amount))
     (sender tx-sender)
+    (vault-principal current-contract)
   )
     (begin (accrue-yield-internal))
     (asserts! (> amount u0) ERR-ZERO-AMOUNT)
     
     ;; Transfer USDCx from user to vault
-    (try! (contract-call? .mock-usdcx transfer amount sender (as-contract tx-sender) none))
+    (try! (contract-call? .mock-usdcx transfer amount sender vault-principal none))
     
     ;; Mint shares to user
     (try! (ft-mint? ap-usdcx shares sender))
     
-    ;; Update state
+    ;; Update total assets
     (var-set total-assets (+ (var-get total-assets) amount))
     
     (print { event: "deposit", amount: amount, shares: shares, user: sender })
@@ -117,6 +161,8 @@
   )
 )
 
+;; Withdraw USDCx by burning apUSDCx shares
+;; Uses Clarity 4 as-contract? with explicit asset allowances for security
 (define-public (withdraw (shares uint))
   (let (
     (assets (preview-withdraw shares))
@@ -125,13 +171,17 @@
     (begin (accrue-yield-internal))
     (asserts! (> shares u0) ERR-ZERO-AMOUNT)
     
-    ;; Burn shares
+    ;; Burn shares from user
     (try! (ft-burn? ap-usdcx shares sender))
     
-    ;; Transfer USDCx to user
-    (try! (as-contract (contract-call? .mock-usdcx transfer assets tx-sender sender none)))
+    ;; Transfer USDCx from vault to user using Clarity 4 as-contract? with FT allowance
+    ;; The inner contract-call? returns a response, so we unwrap it inside as-contract?
+    (try! (as-contract? 
+      ((with-ft .mock-usdcx "usdcx" assets))
+      (unwrap-panic (contract-call? .mock-usdcx transfer assets tx-sender sender none))
+    ))
     
-    ;; Update state
+    ;; Update total assets
     (var-set total-assets (- (var-get total-assets) assets))
     
     (print { event: "withdraw", amount: assets, shares: shares, user: sender })
@@ -139,42 +189,17 @@
   )
 )
 
-;; Admin function to simulate yield accrual for demo
+;; Manually trigger yield accrual (for demo/testing)
 (define-public (harvest)
   (ok (accrue-yield-internal))
 )
 
-;; --- SIP-010 Implementation ---
-
+;; SIP-010: Transfer shares between users
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
   (begin
-    (asserts! (is-eq tx-sender sender) (err u100))
+    (asserts! (is-eq tx-sender sender) ERR-NOT-TOKEN-OWNER)
     (try! (ft-transfer? ap-usdcx amount sender recipient))
     (match memo to-print (print to-print) 0x)
     (ok true)
   )
-)
-
-(define-read-only (get-name)
-  (ok "Apex Yield USDC")
-)
-
-(define-read-only (get-symbol)
-  (ok "apUSDCx")
-)
-
-(define-read-only (get-decimals)
-  (ok u6)
-)
-
-(define-read-only (get-balance (who principal))
-  (ok (ft-get-balance ap-usdcx who))
-)
-
-(define-read-only (get-total-supply)
-  (ok (ft-get-supply ap-usdcx))
-)
-
-(define-read-only (get-token-uri)
-  (ok none)
 )

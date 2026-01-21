@@ -67,15 +67,15 @@ plan:
             contract-name: sip-010-trait
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/sip-010-trait.clar
-            clarity-version: 2
+            clarity-version: 4
         - emulated-contract-publish:
             contract-name: mock-usdcx
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/mock-usdcx.clar
-            clarity-version: 2
+            clarity-version: 4
         - emulated-contract-publish:
             contract-name: apex-vault
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/apex-vault.clar
-            clarity-version: 2
-      epoch: "2.5"
+            clarity-version: 4
+      epoch: "3.3"
