@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { BridgeTracker } from './BridgeTracker';
+import { DeployCapital } from './DeployCapital';
 import { useBridge } from '../hooks/useBridge';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useAccount } from 'wagmi';
@@ -13,6 +14,8 @@ export function ZapFlow() {
   const [amount, setAmount] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<'input' | 'approve' | 'bridge' | 'tracking'>('input');
+  const [showDeployModal, setShowDeployModal] = useState(false);
+  const [bridgedAmount, setBridgedAmount] = useState(0);
   
   const { isConnected: ethConnected } = useAccount();
   const { isConnected: stacksConnected, address: stacksAddress } = useStacksWallet();
@@ -49,6 +52,7 @@ export function ZapFlow() {
     
     try {
       setStep('tracking');
+      setBridgedAmount(Number(amount));
       await bridgeToStacks(amount, stacksAddress);
     } catch (error) {
       console.error('Bridge failed:', error);
@@ -56,9 +60,20 @@ export function ZapFlow() {
     }
   };
 
-  const handleComplete = () => {
-    // Bridge completed - could trigger vault deposit here
-    console.log('Bridge completed, ready for vault deposit');
+  const handleBridgeComplete = () => {
+    // Bridge completed - close zap modal and show deploy modal
+    console.log('Bridge completed, showing deploy modal');
+    setIsOpen(false);
+    setShowDeployModal(true);
+  };
+
+  const handleDeploySuccess = () => {
+    // Reset everything after successful deployment
+    setShowDeployModal(false);
+    setBridgedAmount(0);
+    setAmount('');
+    setStep('input');
+    reset();
   };
 
   const needsApproval = amount ? !hasAllowance(amount) : true;
@@ -66,11 +81,12 @@ export function ZapFlow() {
 
   return (
     <>
-      <Button onClick={handleOpenZap} className="gap-2" variant="default">
+      <Button onClick={handleOpenZap} className="gap-2 w-full" variant="default" size="lg">
         <Zap className="h-4 w-4" />
         Zap from ETH
       </Button>
 
+      {/* Zap Flow Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -179,12 +195,20 @@ export function ZapFlow() {
               <BridgeTracker 
                 bridgeState={bridgeState} 
                 stacksRecipient={stacksAddress || ''}
-                onComplete={handleComplete}
+                onComplete={handleBridgeComplete}
               />
             )}
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Deploy Capital Modal - Shows after bridge completes */}
+      <DeployCapital
+        isOpen={showDeployModal}
+        onClose={() => setShowDeployModal(false)}
+        usdcxBalance={bridgedAmount}
+        onDeploySuccess={handleDeploySuccess}
+      />
     </>
   );
 }

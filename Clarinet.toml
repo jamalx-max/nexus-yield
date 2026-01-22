@@ -21,6 +21,11 @@ path = 'contracts/apex-vault.clar'
 clarity_version = 4
 epoch = 'latest'
 
+[contracts.apex-vault-v2]
+path = 'contracts/apex-vault-v2.clar'
+clarity_version = 4
+epoch = 'latest'
+
 [repl.analysis]
 passes = [
     'call_checker',
@@ -38,5 +43,5 @@ trusted_caller = false
 callee_filter = false
 
 [repl.remote_data]
-enabled = false
-api_url = 'https://api.hiro.so'
+enabled = true
+api_url = 'https://api.testnet.hiro.so'

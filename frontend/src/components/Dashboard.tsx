@@ -9,6 +9,7 @@ import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useAccount } from 'wagmi';
 import { useVaultData } from '../hooks';
 import { ZapFlow } from './ZapFlow';
+import { YieldChart } from './YieldChart';
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
@@ -99,6 +100,15 @@ export function Dashboard() {
             )}
           </CardHeader>
         </Card>
+      </div>
+
+      {/* Yield Comparison Chart */}
+      <div className="max-w-3xl mx-auto">
+        <YieldChart 
+          initialInvestment={10000} 
+          aaveApy={rates.aave} 
+          apexApy={rates.apex} 
+        />
       </div>
 
       {/* Error State */}
