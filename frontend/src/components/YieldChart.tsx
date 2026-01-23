@@ -83,20 +83,22 @@ export function YieldChart({
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
+                  borderRadius: '0px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                labelStyle={{ color: 'hsl(var(--foreground))', fontFamily: 'JetBrains Mono' }}
+                itemStyle={{ fontFamily: 'JetBrains Mono' }}
                 formatter={(value: number, name: string) => [
                   formatUSD(value),
                   name === 'apex' ? 'Apex Yield' : 'Aave'
                 ]}
               />
               <Legend 
+                wrapperStyle={{ fontFamily: 'JetBrains Mono', fontSize: '12px' }}
                 formatter={(value) => value === 'apex' ? 'Apex Yield (13.5%)' : 'Aave (4.2%)'}
               />
               <Line 
-                type="monotone" 
+                type="step" 
                 dataKey="aave" 
                 stroke="hsl(var(--muted-foreground))" 
                 strokeWidth={2}
@@ -104,12 +106,12 @@ export function YieldChart({
                 activeDot={{ r: 4, fill: 'hsl(var(--muted-foreground))' }}
               />
               <Line 
-                type="monotone" 
+                type="step" 
                 dataKey="apex" 
-                stroke="hsl(var(--accent))" 
+                stroke="hsl(var(--primary))" 
                 strokeWidth={3}
                 dot={false}
-                activeDot={{ r: 6, fill: 'hsl(var(--accent))' }}
+                activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
               />
             </LineChart>
           </ResponsiveContainer>
