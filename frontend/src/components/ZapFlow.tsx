@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowDown, Zap, AlertCircle } from 'lucide-react';
+import { ArrowDown, Zap, AlertCircle, Info } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
@@ -13,7 +13,7 @@ import { formatNumber } from '../lib/utils';
 export function ZapFlow() {
   const [amount, setAmount] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState<'input' | 'approve' | 'bridge' | 'tracking'>('input');
+  const [step, setStep] = useState<'input' | 'tracking'>('input');
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [bridgedAmount, setBridgedAmount] = useState(0);
   
@@ -21,7 +21,9 @@ export function ZapFlow() {
   const { isConnected: stacksConnected, address: stacksAddress } = useStacksWallet();
   const { 
     bridgeState, 
-    usdcBalance, 
+    usdcBalance,
+    ethBalance,
+    allowance,
     approveUSDC, 
     bridgeToStacks, 
     hasAllowance,
@@ -38,12 +40,11 @@ export function ZapFlow() {
     if (!amount) return;
     
     try {
-      setStep('approve');
+      // Don't change step to 'approve', keep input UI visible
       await approveUSDC(amount);
-      setStep('bridge');
+      // After success, button will naturally switch to "Bridge" due to hasAllowance check
     } catch (error) {
       console.error('Approval failed:', error);
-      setStep('input');
     }
   };
 
@@ -78,6 +79,8 @@ export function ZapFlow() {
 
   const needsApproval = amount ? !hasAllowance(amount) : true;
   const canProceed = ethConnected && stacksConnected && amount && Number(amount) > 0;
+  const isApproving = bridgeState.status === 'approving';
+  const isBridging = bridgeState.status === 'depositing' || bridgeState.status === 'pending_attestation';
 
   return (
     <>
@@ -119,7 +122,18 @@ export function ZapFlow() {
               <>
                 {/* From */}
                 <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">From (Ethereum)</label>
+                  <div className="flex justify-between items-center text-sm">
+                    <label className="text-muted-foreground">From (Ethereum)</label>
+                    {ethConnected && (
+                      <div className="flex gap-3 text-xs">
+                        <span className="text-muted-foreground">ETH: {formatNumber(ethBalance, 4)}</span>
+                        <span className="text-primary font-mono">
+                          Allowance: {formatNumber(allowance, 2)} USDC
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
                   <div className="relative">
                     <Input
                       type="number"
@@ -127,6 +141,7 @@ export function ZapFlow() {
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       className="pr-20 font-number"
+                      disabled={isApproving}
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">USDC</span>
@@ -134,6 +149,7 @@ export function ZapFlow() {
                         <button
                           onClick={() => setAmount(usdcBalance.toString())}
                           className="text-xs text-primary hover:underline"
+                          disabled={isApproving}
                         >
                           Max
                         </button>
@@ -141,7 +157,7 @@ export function ZapFlow() {
                     </div>
                   </div>
                   {ethConnected && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground text-right">
                       Balance: {formatNumber(usdcBalance, 2)} USDC
                     </p>
                   )}
@@ -174,14 +190,23 @@ export function ZapFlow() {
 
                 {/* Action Button */}
                 {canProceed && needsApproval ? (
-                  <Button onClick={handleApprove} className="w-full" size="lg">
-                    Approve USDC
-                  </Button>
+                  <div className="space-y-2">
+                    <Button onClick={handleApprove} className="w-full" size="lg" disabled={isApproving}>
+                      {isApproving ? 'Approving...' : 'Step 1: Approve USDC'}
+                    </Button>
+                    <p className="text-[10px] text-center text-muted-foreground">
+                      You must approve the bridge contract to spend your USDC.
+                    </p>
+                  </div>
                 ) : canProceed ? (
-                  <Button onClick={handleBridge} className="w-full" size="lg" variant="success">
-                    <Zap className="h-4 w-4 mr-2" />
-                    Bridge to Stacks
-                  </Button>
+                  <div className="space-y-2">
+                    <Button onClick={handleBridge} className="w-full" size="lg" variant="success" disabled={isBridging}>
+                      {isBridging ? 'Bridging...' : 'Step 2: Bridge to Stacks'}
+                    </Button>
+                    <p className="text-[10px] text-center text-muted-foreground">
+                      This will burn USDC on Ethereum and mint USDCx on Stacks.
+                    </p>
+                  </div>
                 ) : (
                   <Button disabled className="w-full" size="lg">
                     {!ethConnected || !stacksConnected ? 'Connect Wallets' : 'Enter Amount'}
@@ -191,7 +216,7 @@ export function ZapFlow() {
             )}
 
             {/* Tracking Step */}
-            {(step === 'tracking' || bridgeState.status !== 'idle') && (
+            {step === 'tracking' && (
               <BridgeTracker 
                 bridgeState={bridgeState} 
                 stacksRecipient={stacksAddress || ''}

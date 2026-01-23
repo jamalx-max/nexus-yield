@@ -1,6 +1,6 @@
 // Custom hook for bridge operations
 import { useState, useCallback } from 'react';
-import { useAccount, useWriteContract, useReadContract } from 'wagmi';
+import { useAccount, useWriteContract, useReadContract, useBalance } from 'wagmi';
 import { 
   X_RESERVE_ABI, 
   USDC_ABI, 
@@ -29,11 +29,16 @@ export function useBridge() {
   });
 
   // Read USDC balance
-  const { data: usdcBalance } = useReadContract({
+  const { data: usdcBalanceData } = useReadContract({
     address: ADDRESSES.USDC as `0x${string}`,
     abi: USDC_ABI,
     functionName: 'balanceOf',
     args: ethAddress ? [ethAddress] : undefined,
+  });
+
+  // Read ETH balance
+  const { data: ethBalanceData } = useBalance({
+    address: ethAddress,
   });
 
   /**
@@ -135,7 +140,8 @@ export function useBridge() {
   return {
     bridgeState,
     allowance: allowance ? Number(allowance) / 1_000_000 : 0,
-    usdcBalance: usdcBalance ? Number(usdcBalance) / 1_000_000 : 0,
+    usdcBalance: usdcBalanceData ? Number(usdcBalanceData) / 1_000_000 : 0,
+    ethBalance: ethBalanceData ? Number(ethBalanceData.value) / 1e18 : 0,
     approveUSDC,
     bridgeToStacks,
     hasAllowance,
