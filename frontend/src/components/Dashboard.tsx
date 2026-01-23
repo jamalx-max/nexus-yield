@@ -1,4 +1,4 @@
-import { TrendingUp, ArrowRight, Wallet, Loader2 } from 'lucide-react';
+import { TrendingUp, ArrowRight, Wallet, Loader2, Info } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -10,10 +10,12 @@ import { useAccount } from 'wagmi';
 import { useVaultData } from '../hooks';
 import { ZapFlow } from './ZapFlow';
 import { YieldChart } from './YieldChart';
+import { ADDRESSES } from '../config/constants';
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
-  const { isConnected: stacksConnected } = useStacksWallet();
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const { isConnected: stacksConnected, address: stacksAddress } = useStacksWallet();
   const { isConnected: ethConnected } = useAccount();
 
   // Use real vault data from the Stacks contract
@@ -24,6 +26,40 @@ export function Dashboard() {
     aave: 4.2,
     apex: vaultData.apy,
     advantage: vaultData.apy - 4.2,
+  };
+
+  // Handle withdraw
+  const handleWithdraw = async () => {
+    if (!stacksAddress || vaultData.userShares <= 0) return;
+    
+    setIsWithdrawing(true);
+    
+    try {
+      const { openContractCall } = await import('@stacks/connect');
+      const { uintCV, PostConditionMode } = await import('@stacks/transactions');
+      
+      const [vaultAddress, vaultName] = ADDRESSES.APEX_VAULT.split('.');
+      const sharesInMicro = Math.floor(vaultData.userShares * 1_000_000);
+      
+      await openContractCall({
+        contractAddress: vaultAddress,
+        contractName: vaultName,
+        functionName: 'withdraw',
+        functionArgs: [uintCV(sharesInMicro)],
+        postConditionMode: PostConditionMode.Allow,
+        onFinish: (data) => {
+          console.log('Withdraw TX submitted:', data.txId);
+          setIsWithdrawing(false);
+        },
+        onCancel: () => {
+          console.log('User cancelled withdrawal');
+          setIsWithdrawing(false);
+        },
+      });
+    } catch (error) {
+      console.error('Withdraw failed:', error);
+      setIsWithdrawing(false);
+    }
   };
 
   return (
@@ -58,6 +94,23 @@ export function Dashboard() {
         <p className="text-sm text-accent">
           +{formatPercent(rates.advantage)} advantage
         </p>
+      </div>
+
+      {/* Demo Mode Banner */}
+      <div className="max-w-3xl mx-auto">
+        <div className="p-4 rounded-lg border border-primary/30 bg-primary/5">
+          <div className="flex items-start gap-3">
+            <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-foreground">Hackathon Demo</p>
+              <p className="text-muted-foreground mt-1">
+                This demo uses <strong>simulated block-based yield</strong> (10 bps per 100 blocks = ~13.5% APY). 
+                The bridge integration uses <strong>real Circle xReserve infrastructure</strong>. 
+                Production deployment will integrate with Stacks lending protocols like Zest and Bitflow for actual borrower-backed yields.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -215,8 +268,20 @@ export function Dashboard() {
                 +{formatUSD(vaultData.userAssets - vaultData.userShares)}
               </span>
             </div>
-            <Button variant="outline" className="w-full mt-2">
-              Withdraw
+            <Button 
+              variant="outline" 
+              className="w-full mt-2"
+              onClick={handleWithdraw}
+              disabled={isWithdrawing || vaultData.userShares <= 0}
+            >
+              {isWithdrawing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Withdrawing...
+                </>
+              ) : (
+                'Withdraw'
+              )}
             </Button>
           </CardContent>
         </Card>

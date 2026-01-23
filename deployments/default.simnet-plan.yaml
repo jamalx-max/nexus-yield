@@ -79,6 +79,11 @@ plan:
             path: contracts/apex-vault.clar
             clarity-version: 4
         - emulated-contract-publish:
+            contract-name: apex-vault-real
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/apex-vault-real.clar
+            clarity-version: 4
+        - emulated-contract-publish:
             contract-name: apex-vault-v2
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/apex-vault-v2.clar
