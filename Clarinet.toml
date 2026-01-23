@@ -4,7 +4,9 @@ description = 'Cross-chain DeFi yield aggregator for USDCx on Stacks'
 authors = []
 telemetry = true
 cache_dir = './.cache'
-requirements = []
+
+[[project.requirements]]
+contract_id = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx'
 
 [contracts.sip-010-trait]
 path = 'contracts/sip-010-trait.clar'

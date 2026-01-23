@@ -181,9 +181,9 @@
     (try! (ft-burn? ap-usdcx shares sender))
     
     ;; Transfer USDCx from vault to user using Clarity 4 as-contract? with FT allowance
-    ;; Uses the real Circle USDCx token
+    ;; Uses the real Circle USDCx token - fungible token is named "usdcx-token" in the contract
     (try! (as-contract? 
-      ((with-ft 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx "usdcx" assets))
+      ((with-ft 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx "usdcx-token" assets))
       (unwrap-panic (contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx transfer assets tx-sender sender none))
     ))
     

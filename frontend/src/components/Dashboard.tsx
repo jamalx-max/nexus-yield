@@ -102,11 +102,11 @@ export function Dashboard() {
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-foreground">Hackathon Demo</p>
+              <p className="font-medium text-foreground">Hackathon Demo - Real USDCx Integration</p>
               <p className="text-muted-foreground mt-1">
-                This demo uses <strong>simulated block-based yield</strong> (10 bps per 100 blocks = ~13.5% APY). 
-                The bridge integration uses <strong>real Circle xReserve infrastructure</strong>. 
-                Production deployment will integrate with Stacks lending protocols like Zest and Bitflow for actual borrower-backed yields.
+                This vault uses <strong>real Circle USDCx</strong> (ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx) bridged from Ethereum via CCTP. 
+                Yield is <strong>simulated</strong> (10 bps per 100 blocks = ~13.5% APY) for demo purposes. 
+                Production will integrate with Stacks lending protocols like Zest and Bitflow for actual borrower-backed yields.
               </p>
             </div>
           </div>

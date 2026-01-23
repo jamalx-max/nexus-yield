@@ -5,12 +5,17 @@ export const ADDRESSES = {
   X_RESERVE: '0x008888878f94C0d87defdf0B07f46B93C1934442' as const,
 
   // Stacks Testnet - Deployed contracts
-  // Note: Using mock-usdcx for vault demo. Real USDCx from bridge is at ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx
-  USDCX_TOKEN: 'STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.mock-usdcx' as const,
-  APEX_VAULT: 'STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.apex-vault' as const,
-  MOCK_USDCX: 'STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.mock-usdcx' as const,
+  // Real Circle USDCx token (bridged from Ethereum via CCTP)
+  USDCX_TOKEN: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx' as const,
   
-  // Real Circle USDCx (for bridge integration reference)
+  // Real vault that uses Circle USDCx
+  APEX_VAULT: 'STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.apex-vault-real' as const,
+  
+  // Mock contracts (kept for testing/demo purposes)
+  MOCK_USDCX: 'STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.mock-usdcx' as const,
+  APEX_VAULT_DEMO: 'STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.apex-vault' as const,
+  
+  // Real Circle USDCx (canonical reference)
   REAL_USDCX: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx' as const,
 } as const;
 
