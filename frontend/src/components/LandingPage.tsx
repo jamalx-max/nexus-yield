@@ -1,6 +1,6 @@
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { ArrowRight, Zap, Layers, Lock, ChevronRight } from 'lucide-react';
+import { ArrowRight, Zap, Layers, Lock, ChevronRight, Cpu } from 'lucide-react';
 
 interface LandingPageProps {
   onLaunch: () => void;
@@ -18,9 +18,14 @@ export function LandingPage({ onLaunch }: LandingPageProps) {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Navigation */}
         <nav className="flex justify-between items-center py-6 border-b border-border/50">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-none skew-x-[-10deg]" />
-            <span className="font-heading font-bold text-xl tracking-tighter">APEX YIELD</span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary skew-x-[-10deg] flex items-center justify-center">
+              <Cpu className="text-black w-6 h-6 skew-x-[10deg]" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-heading font-bold text-xl leading-none tracking-tighter">APEX</span>
+              <span className="font-mono text-xs text-primary tracking-widest">YIELD_PROTOCOL</span>
+            </div>
           </div>
           <Button 
             onClick={onLaunch}
