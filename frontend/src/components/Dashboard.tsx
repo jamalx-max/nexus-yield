@@ -239,17 +239,26 @@ export function Dashboard() {
               </div>
 
               {stacksConnected ? (
-                <Button 
-                  className="w-full h-12 bg-primary text-black hover:bg-white font-bold font-mono rounded-none text-base transition-all" 
-                  disabled={vaultData.isLoading}
-                >
-                  {vaultData.isLoading ? (
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  ) : (
-                    <ArrowUpRight className="h-5 w-5 mr-2" />
-                  )}
-                  CONFIRM_DEPOSIT
-                </Button>
+                <div className="space-y-6">
+                  <Button 
+                    className="w-full h-12 bg-primary text-black hover:bg-white font-bold font-mono rounded-none text-base transition-all" 
+                    disabled={vaultData.isLoading}
+                  >
+                    {vaultData.isLoading ? (
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    ) : (
+                      <ArrowUpRight className="h-5 w-5 mr-2" />
+                    )}
+                    CONFIRM_DEPOSIT
+                  </Button>
+
+                  <div className="border-t border-dashed border-border pt-4">
+                    <p className="text-[10px] font-mono text-center text-muted-foreground mb-3">
+                      NEED ASSETS? BRIDGE FROM ETHEREUM
+                    </p>
+                    <ZapFlow />
+                  </div>
+                </div>
               ) : ethConnected ? (
                 <div className="space-y-4">
                   <div className="p-4 border border-secondary/30 bg-secondary/5">
