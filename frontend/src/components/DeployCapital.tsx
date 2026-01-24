@@ -128,10 +128,17 @@ export function DeployCapital({ isOpen, onClose, usdcxBalance, onDeploySuccess }
                 <label className="text-sm text-muted-foreground">Amount to Deploy</label>
                 <div className="relative">
                   <Input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="^[0-9]*[.,]?[0-9]*$"
                     placeholder="0.00"
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                        setAmount(value);
+                      }
+                    }}
                     className="pr-24 font-number"
                     max={usdcxBalance}
                   />

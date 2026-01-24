@@ -136,10 +136,17 @@ export function ZapFlow() {
                   
                   <div className="relative">
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      pattern="^[0-9]*[.,]?[0-9]*$"
                       placeholder="0.00"
                       value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                          setAmount(value);
+                        }
+                      }}
                       className="pr-20 font-number"
                       disabled={isApproving}
                     />

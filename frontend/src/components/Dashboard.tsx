@@ -226,10 +226,17 @@ export function Dashboard() {
                 </div>
                 <div className="relative">
                   <Input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="^[0-9]*[.,]?[0-9]*$"
                     placeholder="0.00"
                     value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                        setDepositAmount(value);
+                      }
+                    }}
                     className="pr-20 font-mono bg-background/50 border-border focus:border-primary rounded-none h-12 text-lg"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
