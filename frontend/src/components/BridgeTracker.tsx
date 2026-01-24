@@ -3,6 +3,7 @@ import { Clock, CheckCircle, XCircle, Loader2, ExternalLink } from 'lucide-react
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { checkMintStatus, getEstimatedBridgeTime, shortenTxHash, type BridgeState } from '../lib/bridge';
 import { CHAIN_CONFIG } from '../config/constants';
+import { Progress } from './ui/progress';
 
 interface BridgeTrackerProps {
   bridgeState: BridgeState;
@@ -15,6 +16,7 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete, onMint
   const [mintStatus, setMintStatus] = useState<'pending' | 'checking' | 'completed' | 'failed'>('pending');
   const [stacksTxId, setStacksTxId] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   // Poll for mint status
   useEffect(() => {
@@ -33,6 +35,7 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete, onMint
       if (result.success) {
         setMintStatus('completed');
         setStacksTxId(result.txId || null);
+        setProgress(100);
         
         // Refresh USDCx balance before showing deploy modal
         if (onMintDetected) {
@@ -58,18 +61,27 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete, onMint
     return () => clearInterval(interval);
   }, [bridgeState.status, bridgeState.hookData, bridgeState.ethTxHash, stacksRecipient, onComplete, onMintDetected]);
 
-  // Track elapsed time
+  // Track elapsed time and update progress
   useEffect(() => {
     if (bridgeState.status === 'pending_attestation' || 
         bridgeState.status === 'minting' || 
         bridgeState.status === 'depositing') {
       const interval = setInterval(() => {
         setElapsedTime(prev => prev + 1);
+        
+        // Simulate progress based on 15 minute (900s) expected wait
+        // Cap at 95% until actually complete
+        setProgress(() => {
+          if (mintStatus === 'completed') return 100;
+          const estimatedTotal = 900; // 15 mins
+          const newProgress = Math.min((elapsedTime / estimatedTotal) * 100, 95);
+          return newProgress;
+        });
       }, 1000);
       
       return () => clearInterval(interval);
     }
-  }, [bridgeState.status]);
+  }, [bridgeState.status, elapsedTime, mintStatus]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -96,6 +108,17 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete, onMint
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Progress Bar */}
+        {(bridgeState.status === 'pending_attestation' || bridgeState.status === 'minting') && (
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Estimated time: ~15 mins</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <Progress value={progress} className="h-2" />
+          </div>
+        )}
+
         {/* Progress Steps */}
         <div className="space-y-3">
           {/* Step 1: Ethereum Deposit */}

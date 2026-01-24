@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Loader2, Info, Lock, Activity, ArrowUpRight, RefreshCw } from 'lucide-react';
+import { TrendingUp, Wallet, Loader2, Info, Lock, Activity, ArrowUpRight, RefreshCw, Calculator } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Skeleton } from './ui/skeleton';
@@ -12,6 +12,7 @@ import { ZapFlow } from './ZapFlow';
 import { YieldChart } from './YieldChart';
 import { ADDRESSES } from '../config/constants';
 import { showToast, shortenTxHash } from '../lib/toast';
+import { CountUp } from './ui/count-up';
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
@@ -36,6 +37,12 @@ export function Dashboard() {
     apex: vaultData.apy,
     advantage: vaultData.apy - 4.2,
   };
+
+  // Calculate projected earnings
+  const amount = Number(depositAmount) || 0;
+  const dailyYield = (amount * (vaultData.apy / 100)) / 365;
+  const weeklyYield = dailyYield * 7;
+  const yearlyYield = amount * (vaultData.apy / 100);
 
   // Handle manual balance refresh
   const handleRefreshBalances = async () => {
@@ -233,7 +240,7 @@ export function Dashboard() {
           ) : (
             <div className="space-y-1">
               <p className="text-3xl font-heading font-bold text-foreground tracking-tight">
-                {formatUSD(vaultData.totalAssets)}
+                <CountUp end={vaultData.totalAssets} prefix="$" />
               </p>
               <p className="text-xs font-mono text-primary">
                 +12.5% <span className="text-muted-foreground">vs last epoch</span>
@@ -252,7 +259,7 @@ export function Dashboard() {
           ) : (
             <div className="space-y-1">
               <p className="text-3xl font-heading font-bold text-foreground tracking-tight">
-                {formatNumber(vaultData.exchangeRate, 4)}
+                <CountUp end={vaultData.exchangeRate} decimals={4} />
               </p>
               <p className="text-xs font-mono text-muted-foreground">
                 1 apUSDCx = {formatNumber(vaultData.exchangeRate, 4)} USDCx
@@ -370,6 +377,30 @@ export function Dashboard() {
                     USDCx
                   </span>
                 </div>
+
+                {/* Earnings Calculator */}
+                {amount > 0 && (
+                  <div className="bg-secondary/10 border border-secondary/20 p-3 rounded-none animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-2 mb-2 text-xs text-secondary font-bold">
+                      <Calculator className="w-3 h-3" />
+                      PROJECTED RETURNS
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Daily:</span>
+                        <span>{formatUSD(dailyYield)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Weekly:</span>
+                        <span>{formatUSD(weeklyYield)}</span>
+                      </div>
+                      <div className="col-span-2 flex justify-between border-t border-secondary/20 pt-1 mt-1">
+                        <span className="text-muted-foreground">Yearly:</span>
+                        <span className="text-secondary font-bold">{formatUSD(yearlyYield)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {stacksConnected ? (

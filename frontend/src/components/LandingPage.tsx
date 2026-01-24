@@ -157,103 +157,99 @@ export function LandingPage() {
           </div>
         </div>
 
-        {/* SECTION 3: THE STRATEGY (Zest + Bitflow) */}
-        <div className="py-16 border-t border-border/50">
-          <div className="text-center mb-12">
-            <h2 className="font-heading text-3xl font-bold mb-4">THE STRATEGY</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              We aggregate yield from the leading protocols on Stacks. 
-              We do the hard work of bridging, depositing, and auto-compounding.
+        {/* SECTION 3: THE YIELD STACK (Zest + Bitflow) */}
+        <div className="py-24 border-t border-border/50 bg-secondary/5">
+          <div className="text-center mb-16">
+            <h2 className="font-heading text-4xl font-bold mb-6">THE YIELD STACK</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              We don't just bridge. We compose the best DeFi sources on Stacks into a single, optimized vault.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Zest Protocol */}
-            <Card className="bg-card border-border group hover:border-primary/50 transition-all">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Activity className="w-6 h-6 text-primary" />
+          <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center px-4">
+            {/* Left: The Stack Visual */}
+            <div className="relative space-y-4">
+              <div className="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary/50 to-accent/50 -z-10" />
+              
+              {/* Layer 3: The Aggregate */}
+              <div className="ml-0 bg-card border border-primary/30 p-6 rounded-lg shadow-[0_0_30px_rgba(16,185,129,0.1)] relative transform transition-transform hover:-translate-y-1 duration-300">
+                <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-background border-2 border-primary rounded-full flex items-center justify-center z-10">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                 </div>
-                <h3 className="font-heading text-xl font-bold mb-2">Zest Protocol</h3>
-                <div className="inline-block px-2 py-0.5 bg-primary/10 text-primary text-xs font-mono mb-4 rounded">
-                  LENDING_MARKET
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-heading text-xl font-bold text-primary">APEX VAULT</h3>
+                  <span className="font-mono text-xl font-bold text-primary">~13.5% APY</span>
                 </div>
-                <p className="text-muted-foreground text-sm mb-4">
-                  The first on-chain lending market on Stacks. Earn yield by supplying USDC to borrowers.
-                </p>
-                <ul className="space-y-2 text-sm text-muted-foreground font-mono">
-                  <li className="flex items-center gap-2">
-                    <ChevronRight className="w-3 h-3 text-primary" /> 
-                    Supply APY: ~8-12%
-                  </li>
-                  <li className="flex items-center gap-2 text-accent">
-                    <ChevronRight className="w-3 h-3" /> 
-                    + Zest Points (Airdrop)
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Bitflow Finance */}
-            <Card className="bg-card border-border group hover:border-secondary/50 transition-all">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-6 h-6 text-secondary" />
-                </div>
-                <h3 className="font-heading text-xl font-bold mb-2">Bitflow Finance</h3>
-                <div className="inline-block px-2 py-0.5 bg-secondary/10 text-secondary text-xs font-mono mb-4 rounded">
-                  REAL_YIELD_DEX
-                </div>
-                <p className="text-muted-foreground text-sm mb-4">
-                  The liquidity hub for Bitcoiners. Earn "Real Yield" from trading fees on stablecoin pools.
-                </p>
-                <ul className="space-y-2 text-sm text-muted-foreground font-mono">
-                  <li className="flex items-center gap-2">
-                    <ChevronRight className="w-3 h-3 text-secondary" /> 
-                    aeUSDC-USDCx Pool
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ChevronRight className="w-3 h-3 text-secondary" /> 
-                    Yield in USDC (No dumps)
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Apex Vault */}
-            <Card className="bg-card border-border group hover:border-accent/50 transition-all relative overflow-hidden shadow-lg shadow-accent/5">
-              <div className="absolute top-0 right-0 p-2">
-                <div className="bg-accent text-accent-foreground text-[10px] font-bold px-2 py-1 rounded">
-                  YOU ARE HERE
-                </div>
+                <p className="text-sm text-muted-foreground">Auto-compounding, gas-optimized, single-token receipt (apUSDC).</p>
               </div>
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="w-6 h-6 text-accent" />
+
+              {/* Connector Line */}
+              <div className="ml-12 h-8 border-l-2 border-dashed border-muted-foreground/30" />
+
+              {/* Layer 2: Bitflow */}
+              <div className="ml-12 bg-card/50 border border-border p-5 rounded-lg relative hover:bg-card transition-colors">
+                <div className="absolute -left-[2.1rem] top-1/2 -translate-y-1/2 w-4 h-4 bg-secondary rounded-full border-4 border-background" />
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-bold flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-secondary" /> Bitflow Finance
+                  </h4>
+                  <span className="font-mono text-secondary text-sm">+ ~5.5%</span>
                 </div>
-                <h3 className="font-heading text-xl font-bold mb-2">Apex Vault</h3>
-                <div className="inline-block px-2 py-0.5 bg-accent/10 text-accent text-xs font-mono mb-4 rounded">
-                  YIELD_AGGREGATOR
+                <p className="text-xs text-muted-foreground">Real Yield from stablecoin swap fees (USDC/stX).</p>
+              </div>
+
+              {/* Connector Line */}
+              <div className="ml-12 h-4 border-l-2 border-dashed border-muted-foreground/30" />
+
+              {/* Layer 1: Zest */}
+              <div className="ml-12 bg-card/50 border border-border p-5 rounded-lg relative hover:bg-card transition-colors">
+                <div className="absolute -left-[2.1rem] top-1/2 -translate-y-1/2 w-4 h-4 bg-accent rounded-full border-4 border-background" />
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-bold flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-accent" /> Zest Protocol
+                  </h4>
+                  <span className="font-mono text-accent text-sm">+ ~8.0%</span>
                 </div>
-                <p className="text-muted-foreground text-sm mb-4">
-                  We automate the entire process. Deposit once, earn forever.
+                <p className="text-xs text-muted-foreground">Base lending APY + Early Adopter Points.</p>
+              </div>
+            </div>
+
+            {/* Right: The Explanation */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                  <Layers className="w-6 h-6 text-primary" />
+                  Why Stacks Yields Are Higher
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Bitcoin is a $1 Trillion asset class with almost zero native yield. 
+                  Stacks brings smart contracts to Bitcoin.
+                  <br /><br />
+                  Borrowers on Stacks are willing to pay <strong className="text-foreground">premium rates (12-15%)</strong> to borrow stablecoins against their BTC collateral. 
+                  Ethereum markets are saturated; Stacks markets are starving for liquidity.
                 </p>
-                <ul className="space-y-2 text-sm text-muted-foreground font-mono">
-                  <li className="flex items-center gap-2">
-                    <ChevronRight className="w-3 h-3 text-accent" /> 
-                    Auto-Compound Rewards
+              </div>
+
+              <div className="bg-primary/5 border border-primary/20 p-6 rounded-lg">
+                <h4 className="font-bold text-primary mb-2 flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5" /> Institutional Safety
+                </h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    <span>Assets secured by <strong>Bitcoin finality</strong> via Stacks Nakamoto Release.</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <ChevronRight className="w-3 h-3 text-accent" /> 
-                    Gas Optimization
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    <span><strong>Circle CCTP</strong> ensures 1:1 bridging (no bridge hacks).</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <ChevronRight className="w-3 h-3 text-accent" /> 
-                    Strategy Switching
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    <span>Non-custodial vault logic (auditable Clarity code).</span>
                   </li>
                 </ul>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
 
