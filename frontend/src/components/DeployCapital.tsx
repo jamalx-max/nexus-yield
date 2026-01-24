@@ -23,12 +23,20 @@ export function DeployCapital({ isOpen, onClose, onDeploySuccess }: DeployCapita
   // Get real-time USDCx balance
   const { balance: usdcxBalance, refetch: refetchUSDCx, isLoading: isLoadingUSDCx } = useUSDCxBalance();
 
-  // Reset state when modal opens
+  // Reset state when modal opens and fetch latest balance
   useEffect(() => {
     if (isOpen) {
-      setAmount(usdcxBalance.toString());
+      // Immediately fetch latest USDCx balance when modal opens
+      refetchUSDCx();
       setIsDepositing(false);
       setIsSuccess(false);
+    }
+  }, [isOpen, refetchUSDCx]);
+
+  // Update amount when balance changes
+  useEffect(() => {
+    if (isOpen && usdcxBalance > 0) {
+      setAmount(usdcxBalance.toString());
     }
   }, [isOpen, usdcxBalance]);
 
