@@ -11,6 +11,7 @@ import { useBridge } from '../hooks/useBridge';
 import { ZapFlow } from './ZapFlow';
 import { YieldChart } from './YieldChart';
 import { ADDRESSES } from '../config/constants';
+import { showToast, shortenTxHash } from '../lib/toast';
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
@@ -84,20 +85,20 @@ export function Dashboard() {
           ),
         ],
         onFinish: (data) => {
-          console.log('Deposit TX submitted:', data.txId);
+          showToast.success(`Deposit submitted! TX: ${shortenTxHash(data.txId)}`);
           setIsDepositing(false);
           setDepositAmount('');
           refetchUSDCx();
           vaultData.refetch(); // Refresh vault data (TVL, shares, etc.)
         },
         onCancel: () => {
-          console.log('User cancelled deposit');
+          showToast.info('Deposit cancelled');
           setIsDepositing(false);
         },
       });
     } catch (error) {
-      console.error('Deposit failed:', error);
-      alert(`Deposit failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      showToast.error(`Deposit failed: ${errorMessage}`);
       setIsDepositing(false);
     }
   };
@@ -124,18 +125,19 @@ export function Dashboard() {
         functionArgs: [uintCV(sharesInMicro)],
         postConditionMode: PostConditionMode.Allow,
         onFinish: (data) => {
-          console.log('Withdraw TX submitted:', data.txId);
+          showToast.success(`Withdrawal submitted! TX: ${shortenTxHash(data.txId)}`);
           setIsWithdrawing(false);
           refetchUSDCx(); // Refresh USDCx balance (user now has more)
           vaultData.refetch(); // Refresh vault data (TVL, shares, etc.)
         },
         onCancel: () => {
-          console.log('User cancelled withdrawal');
+          showToast.info('Withdrawal cancelled');
           setIsWithdrawing(false);
         },
       });
     } catch (error) {
-      console.error('Withdraw failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      showToast.error(`Withdrawal failed: ${errorMessage}`);
       setIsWithdrawing(false);
     }
   };

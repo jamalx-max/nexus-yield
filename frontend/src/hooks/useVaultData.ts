@@ -77,8 +77,7 @@ export function useVaultData(): VaultData {
           );
           userShares = parseUintResult(userBalanceResult);
         } catch (e) {
-          // User might not have any shares
-          console.warn('Could not fetch user balance:', e);
+          // User might not have any shares - silent fail
         }
       }
       
@@ -98,7 +97,7 @@ export function useVaultData(): VaultData {
         error: null,
       });
     } catch (error: any) {
-      console.error('Error fetching vault data:', error);
+      // Silent fail on vault data errors - set error state for UI handling
       setData(prev => ({
         ...prev,
         isLoading: false,

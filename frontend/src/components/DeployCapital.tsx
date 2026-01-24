@@ -7,6 +7,7 @@ import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useUSDCxBalance } from '../hooks/useUSDCxBalance';
 import { formatNumber, formatUSD } from '../lib/utils';
 import { ADDRESSES } from '../config/constants';
+import { showToast, shortenTxHash } from '../lib/toast';
 
 interface DeployCapitalProps {
   isOpen: boolean;
@@ -77,20 +78,20 @@ export function DeployCapital({ isOpen, onClose, onDeploySuccess }: DeployCapita
           ),
         ],
         onFinish: (data) => {
-          console.log('Deposit TX submitted:', data.txId);
+          showToast.success(`Deployment successful! TX: ${shortenTxHash(data.txId)}`);
           setIsSuccess(true);
           setIsDepositing(false);
           refetchUSDCx(); // Refresh balance after deposit
           onDeploySuccess?.();
         },
         onCancel: () => {
-          console.log('User cancelled deposit');
+          showToast.info('Deployment cancelled');
           setIsDepositing(false);
         },
       });
     } catch (error) {
-      console.error('Deploy failed:', error);
-      alert(`Deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      showToast.error(`Deployment failed: ${errorMessage}`);
       setIsDepositing(false);
     }
   }, [stacksAddress, amount, onDeploySuccess]);

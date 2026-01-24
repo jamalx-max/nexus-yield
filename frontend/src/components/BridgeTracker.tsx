@@ -31,7 +31,6 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete, onMint
       const result = await checkMintStatus(bridgeState.hookData, stacksRecipient);
       
       if (result.success) {
-        console.log('✅ Mint event detected!', result);
         setMintStatus('completed');
         setStacksTxId(result.txId || null);
         

@@ -42,7 +42,7 @@ export function useUSDCxBalance(): USDCxBalanceData {
       setBalance(balanceMicro / 1_000_000); // Convert to decimal (6 decimals)
       setIsLoading(false);
     } catch (err: any) {
-      console.error('Error fetching USDCx balance:', err);
+      // Silent fail on balance fetch errors
       setError(err.message || 'Failed to fetch balance');
       setBalance(0);
       setIsLoading(false);
