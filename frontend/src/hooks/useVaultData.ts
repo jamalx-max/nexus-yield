@@ -4,7 +4,7 @@ import { ADDRESSES } from '../config/constants';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { callReadOnly, parseUintResult, principalToHex } from '../lib/stacks/contracts';
 
-interface VaultData {
+interface VaultDataState {
   totalAssets: number;
   totalSupply: number;
   exchangeRate: number;
@@ -15,11 +15,15 @@ interface VaultData {
   error: string | null;
 }
 
+interface VaultData extends VaultDataState {
+  refetch: () => Promise<void>;
+}
+
 const VAULT_CONTRACT = ADDRESSES.APEX_VAULT;
 
 export function useVaultData(): VaultData {
   const { isConnected, address } = useStacksWallet();
-  const [data, setData] = useState<VaultData>({
+  const [data, setData] = useState<VaultDataState>({
     totalAssets: 0,
     totalSupply: 0,
     exchangeRate: 1_000_000, // 1.0 with 6 decimals
@@ -112,5 +116,8 @@ export function useVaultData(): VaultData {
     return () => clearInterval(interval);
   }, [fetchVaultData]);
 
-  return data;
+  return {
+    ...data,
+    refetch: fetchVaultData,
+  };
 }

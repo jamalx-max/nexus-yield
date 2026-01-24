@@ -86,6 +86,7 @@ export function Dashboard() {
           setIsDepositing(false);
           setDepositAmount('');
           refetchUSDCx();
+          vaultData.refetch(); // Refresh vault data (TVL, shares, etc.)
         },
         onCancel: () => {
           console.log('User cancelled deposit');
@@ -121,6 +122,8 @@ export function Dashboard() {
         onFinish: (data) => {
           console.log('Withdraw TX submitted:', data.txId);
           setIsWithdrawing(false);
+          refetchUSDCx(); // Refresh USDCx balance (user now has more)
+          vaultData.refetch(); // Refresh vault data (TVL, shares, etc.)
         },
         onCancel: () => {
           console.log('User cancelled withdrawal');
