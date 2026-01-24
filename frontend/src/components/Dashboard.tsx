@@ -15,6 +15,7 @@ import { ADDRESSES } from '../config/constants';
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [isDepositing, setIsDepositing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { isConnected: stacksConnected, address: stacksAddress } = useStacksWallet();
   const { isConnected: ethConnected } = useAccount();
@@ -43,6 +44,58 @@ export function Dashboard() {
     } finally {
       // Keep spinner for at least 500ms for visual feedback
       setTimeout(() => setIsRefreshing(false), 500);
+    }
+  };
+
+  // Handle deposit
+  const handleDeposit = async () => {
+    if (!stacksAddress || !depositAmount || Number(depositAmount) <= 0) return;
+
+    setIsDepositing(true);
+
+    try {
+      const { openContractCall } = await import('@stacks/connect');
+      const { 
+        uintCV, 
+        PostConditionMode, 
+        makeStandardFungiblePostCondition,
+        FungibleConditionCode,
+        createAssetInfo 
+      } = await import('@stacks/transactions');
+
+      const amountMicroUsdc = Math.floor(Number(depositAmount) * 1_000_000);
+      const [vaultAddress, vaultName] = ADDRESSES.APEX_VAULT.split('.');
+      const [tokenAddress, tokenName] = ADDRESSES.USDCX_TOKEN.split('.');
+
+      await openContractCall({
+        contractAddress: vaultAddress,
+        contractName: vaultName,
+        functionName: 'deposit',
+        functionArgs: [uintCV(amountMicroUsdc)],
+        postConditionMode: PostConditionMode.Deny,
+        postConditions: [
+          makeStandardFungiblePostCondition(
+            stacksAddress,
+            FungibleConditionCode.LessEqual,
+            amountMicroUsdc,
+            createAssetInfo(tokenAddress, tokenName, 'usdcx-token')
+          ),
+        ],
+        onFinish: (data) => {
+          console.log('Deposit TX submitted:', data.txId);
+          setIsDepositing(false);
+          setDepositAmount('');
+          refetchUSDCx();
+        },
+        onCancel: () => {
+          console.log('User cancelled deposit');
+          setIsDepositing(false);
+        },
+      });
+    } catch (error) {
+      console.error('Deposit failed:', error);
+      alert(`Deposit failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setIsDepositing(false);
     }
   };
 
@@ -282,7 +335,12 @@ export function Dashboard() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <label className="text-xs font-mono text-muted-foreground">AMOUNT</label>
-                  <span className="text-xs font-mono text-primary">MAX: --</span>
+                  <button 
+                    onClick={() => setDepositAmount(usdcxBalance.toString())}
+                    className="text-xs font-mono text-primary hover:underline cursor-pointer"
+                  >
+                    MAX: {formatNumber(usdcxBalance, 2)}
+                  </button>
                 </div>
                 <div className="relative">
                   <Input
@@ -309,14 +367,20 @@ export function Dashboard() {
                 <div className="space-y-6">
                   <Button 
                     className="w-full h-12 bg-primary text-black hover:bg-white font-bold font-mono rounded-none text-base transition-all" 
-                    disabled={vaultData.isLoading}
+                    onClick={handleDeposit}
+                    disabled={isDepositing || Number(depositAmount) <= 0 || Number(depositAmount) > usdcxBalance}
                   >
-                    {vaultData.isLoading ? (
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    {isDepositing ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        PROCESSING...
+                      </>
                     ) : (
-                      <ArrowUpRight className="h-5 w-5 mr-2" />
+                      <>
+                        <ArrowUpRight className="h-5 w-5 mr-2" />
+                        CONFIRM_DEPOSIT
+                      </>
                     )}
-                    CONFIRM_DEPOSIT
                   </Button>
 
                   <div className="border-t border-dashed border-border pt-4">
