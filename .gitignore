@@ -1,12 +1,6 @@
-**/settings/Mainnet.toml
-**/settings/Testnet.toml
-.cache/**
-history.txt
 
-logs
-*.log
-npm-debug.log*
-coverage
-*.info
-costs-reports.json
-node_modules
+# Documentation (Internal)
+idea.md
+prd.md
+BRIDGE_GUIDE.md
+VIDEO_SCRIPT.md
