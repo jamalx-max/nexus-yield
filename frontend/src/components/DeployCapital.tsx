@@ -55,12 +55,14 @@ export function DeployCapital({ isOpen, onClose, onDeploySuccess }: DeployCapita
         FungibleConditionCode,
         createAssetInfo 
       } = await import('@stacks/transactions');
+      const network = await import('@stacks/network');
 
       const amountMicroUsdc = Math.floor(Number(amount) * 1_000_000);
       const [vaultAddress, vaultName] = ADDRESSES.APEX_VAULT.split('.');
       const [tokenAddress, tokenName] = ADDRESSES.USDCX_TOKEN.split('.');
 
       await openContractCall({
+        network: network.STACKS_TESTNET,
         contractAddress: vaultAddress,
         contractName: vaultName,
         functionName: 'deposit',

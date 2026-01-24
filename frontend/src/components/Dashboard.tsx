@@ -62,12 +62,14 @@ export function Dashboard() {
         FungibleConditionCode,
         createAssetInfo 
       } = await import('@stacks/transactions');
+      const network = await import('@stacks/network');
 
       const amountMicroUsdc = Math.floor(Number(depositAmount) * 1_000_000);
       const [vaultAddress, vaultName] = ADDRESSES.APEX_VAULT.split('.');
       const [tokenAddress, tokenName] = ADDRESSES.USDCX_TOKEN.split('.');
 
       await openContractCall({
+        network: network.STACKS_TESTNET,
         contractAddress: vaultAddress,
         contractName: vaultName,
         functionName: 'deposit',
@@ -109,11 +111,13 @@ export function Dashboard() {
     try {
       const { openContractCall } = await import('@stacks/connect');
       const { uintCV, PostConditionMode } = await import('@stacks/transactions');
+      const network = await import('@stacks/network');
       
       const [vaultAddress, vaultName] = ADDRESSES.APEX_VAULT.split('.');
       const sharesInMicro = Math.floor(vaultData.userShares * 1_000_000);
       
       await openContractCall({
+        network: network.STACKS_TESTNET,
         contractAddress: vaultAddress,
         contractName: vaultName,
         functionName: 'withdraw',
