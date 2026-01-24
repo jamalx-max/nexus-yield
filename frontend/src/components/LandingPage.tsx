@@ -38,7 +38,7 @@ export function LandingPage() {
         <div className="py-20 lg:py-32 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8 relative z-20">
             <div className="inline-block px-3 py-1 border border-accent/30 bg-accent/5 text-accent font-mono text-xs mb-4">
-              /// HACKATHON_BUILD_2026
+              /// STACKS_BUILD_2026
             </div>
             <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black leading-[0.9] tracking-tighter">
               PROGRAM<br />
@@ -164,8 +164,7 @@ export function LandingPage() {
         <footer className="py-12 border-t border-border/50 flex justify-between items-center text-sm text-muted-foreground">
           <div className="font-mono">APEX_YIELD_v1.0.0</div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-primary transition-colors">GITHUB</a>
-            <a href="#" className="hover:text-primary transition-colors">TWITTER</a>
+            <a href="https://github.com/man-croft/ApexYield" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">GITHUB</a>
           </div>
         </footer>
       </div>
