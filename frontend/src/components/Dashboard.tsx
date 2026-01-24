@@ -220,7 +220,7 @@ export function Dashboard() {
           <div className="text-sm font-mono">
             <p className="font-bold text-primary uppercase mb-1">SYSTEM_NOTICE: DEMO_MODE</p>
             <p className="text-muted-foreground">
-              Connected to <strong className="text-foreground">Circle USDCx Mainnet</strong> (Bridged via CCTP). 
+              Connected to <strong className="text-foreground">Circle USDCx Testnet</strong> (Bridged via CCTP). 
               Yield simulation active (10bps/100blocks). 
               <span className="block mt-1 opacity-70">Pending dependency: Zest Protocol Mainnet Launch.</span>
             </p>
