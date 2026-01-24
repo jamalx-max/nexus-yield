@@ -1,25 +1,24 @@
 import { ArrowRight, TrendingUp, ShieldCheck, Zap, ChevronRight, Activity } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
+import { Link, useNavigate } from 'react-router-dom';
 
-interface WhyPageProps {
-  onDeploy: () => void;
-  onBack: () => void;
-}
+export function WhyPage() {
+  const navigate = useNavigate();
 
-export function WhyPage({ onDeploy, onBack }: WhyPageProps) {
   return (
     <div className="min-h-screen bg-background text-foreground animate-in fade-in duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Navigation */}
         <div className="flex items-center gap-4 mb-12">
-          <Button 
-            variant="ghost" 
-            onClick={onBack}
-            className="font-mono text-muted-foreground hover:text-primary pl-0 hover:bg-transparent"
-          >
-            {'< RETURN_TO_BASE'}
-          </Button>
+          <Link to="/">
+            <Button 
+              variant="ghost" 
+              className="font-mono text-muted-foreground hover:text-primary pl-0 hover:bg-transparent"
+            >
+              {'< RETURN_TO_BASE'}
+            </Button>
+          </Link>
         </div>
 
         {/* Hero Section */}
@@ -39,7 +38,7 @@ export function WhyPage({ onDeploy, onBack }: WhyPageProps) {
               <br /><br />
               The smart money is moving to where the demand is: <span className="text-foreground font-bold">Bitcoin L2s</span>.
             </p>
-            <Button onClick={onDeploy} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none h-14 px-8 font-bold text-lg skew-x-[-5deg]">
+            <Button onClick={() => navigate('/dashboard')} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none h-14 px-8 font-bold text-lg skew-x-[-5deg]">
               DEPLOY_CAPITAL <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
@@ -211,7 +210,7 @@ export function WhyPage({ onDeploy, onBack }: WhyPageProps) {
             <div className="flex flex-col items-center p-4 bg-background border border-border rounded-lg w-full md:w-48">
               <span className="font-mono text-xs text-muted-foreground mb-2">STEP 01</span>
               <span className="font-bold text-lg mb-1">DEPOSIT</span>
-              <span className="text-sm text-muted-foreground">USDC (Eth)</span>
+              <span className="text-sm text-muted-foreground">USDCx (Stacks)</span>
             </div>
 
             <ArrowRight className="text-muted-foreground rotate-90 md:rotate-0" />
@@ -246,7 +245,7 @@ export function WhyPage({ onDeploy, onBack }: WhyPageProps) {
           <p className="font-mono text-sm text-muted-foreground mb-6">
             /// READY_TO_INITIATE_SEQUENCE?
           </p>
-          <Button onClick={onDeploy} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none h-16 px-12 font-bold text-xl skew-x-[-5deg] shadow-lg shadow-primary/20">
+          <Button onClick={() => navigate('/dashboard')} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none h-16 px-12 font-bold text-xl skew-x-[-5deg] shadow-lg shadow-primary/20">
             LAUNCH APP_
           </Button>
         </div>

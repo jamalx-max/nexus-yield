@@ -3,12 +3,9 @@ import { Wallet, Cpu } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useStacksWallet } from '../../providers/StacksWalletProvider';
 import { shortenAddress } from '../../lib/utils';
+import { Link } from 'react-router-dom';
 
-interface NavbarProps {
-  onBrandClick?: () => void;
-}
-
-export function Navbar({ onBrandClick }: NavbarProps) {
+export function Navbar() {
   const { isConnected: stacksConnected, address: stacksAddress, connect: connectStacks, disconnect: disconnectStacks } = useStacksWallet();
 
   return (
@@ -16,7 +13,7 @@ export function Navbar({ onBrandClick }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <button onClick={onBrandClick} className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 bg-primary skew-x-[-10deg] flex items-center justify-center group-hover:bg-accent transition-colors">
               <Cpu className="text-black w-6 h-6 skew-x-[10deg]" />
             </div>
@@ -24,7 +21,7 @@ export function Navbar({ onBrandClick }: NavbarProps) {
               <span className="font-heading font-bold text-xl leading-none tracking-tighter">APEX</span>
               <span className="font-mono text-xs text-primary tracking-widest group-hover:text-accent transition-colors">YIELD_PROTOCOL</span>
             </div>
-          </button>
+          </Link>
 
           {/* Rate Ticker */}
           <div className="hidden md:flex items-center gap-8 text-sm border-x border-border/50 px-8 h-full bg-background/50">

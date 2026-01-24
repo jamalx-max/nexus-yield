@@ -1,13 +1,11 @@
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { ArrowRight, Zap, Layers, Lock, ChevronRight, Cpu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-interface LandingPageProps {
-  onLaunch: () => void;
-  onWhy: () => void;
-}
+export function LandingPage() {
+  const navigate = useNavigate();
 
-export function LandingPage({ onLaunch, onWhy }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Abstract Background Elements */}
@@ -29,7 +27,7 @@ export function LandingPage({ onLaunch, onWhy }: LandingPageProps) {
             </div>
           </div>
           <Button 
-            onClick={onLaunch}
+            onClick={() => navigate('/dashboard')}
             className="bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-sm border-2 border-transparent hover:border-primary hover:bg-transparent hover:text-primary transition-all rounded-none"
           >
             [ LAUNCH_APP ]
@@ -54,7 +52,7 @@ export function LandingPage({ onLaunch, onWhy }: LandingPageProps) {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
-                onClick={onLaunch}
+                onClick={() => navigate('/dashboard')}
                 size="lg" 
                 className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-lg px-8 h-14 rounded-none skew-x-[-5deg]"
               >
@@ -63,7 +61,7 @@ export function LandingPage({ onLaunch, onWhy }: LandingPageProps) {
               <Button 
                 variant="outline" 
                 size="lg" 
-                onClick={onWhy}
+                onClick={() => navigate('/why')}
                 className="border-border hover:bg-accent hover:text-accent-foreground text-muted-foreground font-mono h-14 rounded-none skew-x-[-5deg] transition-all"
               >
                 WHY?
