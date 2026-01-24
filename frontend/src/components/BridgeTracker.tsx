@@ -8,16 +8,19 @@ interface BridgeTrackerProps {
   bridgeState: BridgeState;
   stacksRecipient: string;
   onComplete?: () => void;
+  onMintDetected?: () => Promise<void>;
 }
 
-export function BridgeTracker({ bridgeState, stacksRecipient, onComplete }: BridgeTrackerProps) {
+export function BridgeTracker({ bridgeState, stacksRecipient, onComplete, onMintDetected }: BridgeTrackerProps) {
   const [mintStatus, setMintStatus] = useState<'pending' | 'checking' | 'completed' | 'failed'>('pending');
   const [stacksTxId, setStacksTxId] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
   // Poll for mint status
   useEffect(() => {
-    if (bridgeState.status !== 'pending_attestation' && bridgeState.status !== 'minting') {
+    if (bridgeState.status !== 'pending_attestation' && 
+        bridgeState.status !== 'minting' && 
+        bridgeState.status !== 'depositing') {
       return;
     }
 
@@ -28,13 +31,24 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete }: Brid
       const result = await checkMintStatus(bridgeState.hookData, stacksRecipient);
       
       if (result.success) {
+        console.log('✅ Mint event detected!', result);
         setMintStatus('completed');
         setStacksTxId(result.txId || null);
+        
+        // Refresh USDCx balance before showing deploy modal
+        if (onMintDetected) {
+          await onMintDetected();
+        }
+        
+        // Call onComplete immediately when REAL mint is detected
         onComplete?.();
       } else {
         setMintStatus('pending');
       }
     };
+
+    // Only start checking if we have a transaction hash
+    if (!bridgeState.ethTxHash) return;
 
     // Check immediately
     checkStatus();
@@ -43,11 +57,13 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete }: Brid
     const interval = setInterval(checkStatus, 15000);
     
     return () => clearInterval(interval);
-  }, [bridgeState.status, bridgeState.hookData, stacksRecipient, onComplete]);
+  }, [bridgeState.status, bridgeState.hookData, bridgeState.ethTxHash, stacksRecipient, onComplete, onMintDetected]);
 
   // Track elapsed time
   useEffect(() => {
-    if (bridgeState.status === 'pending_attestation' || bridgeState.status === 'minting') {
+    if (bridgeState.status === 'pending_attestation' || 
+        bridgeState.status === 'minting' || 
+        bridgeState.status === 'depositing') {
       const interval = setInterval(() => {
         setElapsedTime(prev => prev + 1);
       }, 1000);
@@ -150,7 +166,9 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete }: Brid
         </div>
 
         {/* Timer */}
-        {bridgeState.status === 'pending_attestation' && (
+        {(bridgeState.status === 'pending_attestation' || 
+          bridgeState.status === 'depositing' || 
+          bridgeState.status === 'minting') && (
           <div className="flex items-center justify-center gap-2 py-2 text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span className="font-mono">{formatTime(elapsedTime)}</span>

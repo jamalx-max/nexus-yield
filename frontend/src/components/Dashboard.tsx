@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Loader2, Info, Lock, Activity, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, Wallet, Loader2, Info, Lock, Activity, ArrowUpRight, RefreshCw } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Skeleton } from './ui/skeleton';
@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { formatUSD, formatPercent, formatNumber } from '../lib/utils';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useAccount } from 'wagmi';
-import { useVaultData } from '../hooks';
+import { useVaultData, useUSDCxBalance } from '../hooks';
+import { useBridge } from '../hooks/useBridge';
 import { ZapFlow } from './ZapFlow';
 import { YieldChart } from './YieldChart';
 import { ADDRESSES } from '../config/constants';
@@ -14,17 +15,35 @@ import { ADDRESSES } from '../config/constants';
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { isConnected: stacksConnected, address: stacksAddress } = useStacksWallet();
   const { isConnected: ethConnected } = useAccount();
 
   // Use real vault data from the Stacks contract
   const vaultData = useVaultData();
+  
+  // Get USDCx balance on Stacks
+  const { balance: usdcxBalance, refetch: refetchUSDCx, isLoading: isLoadingUSDCx } = useUSDCxBalance();
+  
+  // Get ETH and USDC balances from bridge hook
+  const { usdcBalance, ethBalance } = useBridge();
 
   // Competition rates for comparison
   const rates = {
     aave: 4.2,
     apex: vaultData.apy,
     advantage: vaultData.apy - 4.2,
+  };
+
+  // Handle manual balance refresh
+  const handleRefreshBalances = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetchUSDCx();
+    } finally {
+      // Keep spinner for at least 500ms for visual feedback
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
   };
 
   // Handle withdraw
@@ -82,6 +101,47 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Wallet Balances Section */}
+      {(stacksConnected || ethConnected) && (
+        <div className="border border-border/50 bg-card/30 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-mono text-muted-foreground uppercase tracking-wide">
+              Wallet Balances
+            </p>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleRefreshBalances}
+              disabled={isRefreshing || isLoadingUSDCx}
+              className="h-7 w-7 p-0 hover:bg-secondary"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing || isLoadingUSDCx ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-sm">
+            <div className="p-3 bg-background/50 border border-border/30">
+              <p className="text-muted-foreground text-xs mb-1">ETH (Sepolia)</p>
+              <p className="font-semibold text-lg">
+                {ethConnected ? formatNumber(ethBalance, 4) : '--'}
+              </p>
+            </div>
+            <div className="p-3 bg-background/50 border border-border/30">
+              <p className="text-muted-foreground text-xs mb-1">USDC (Sepolia)</p>
+              <p className="font-semibold text-lg">
+                {ethConnected ? formatNumber(usdcBalance, 2) : '--'}
+              </p>
+            </div>
+            <div className="p-3 bg-background/50 border border-primary/20">
+              <p className="text-muted-foreground text-xs mb-1">USDCx (Stacks)</p>
+              <p className="font-semibold text-lg text-primary">
+                {stacksConnected ? formatNumber(usdcxBalance, 2) : '--'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Demo Mode Banner - System Style */}
       <div className="border border-primary/30 bg-primary/5 p-4 relative overflow-hidden">

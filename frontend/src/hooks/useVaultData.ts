@@ -1,7 +1,8 @@
 // Custom hook for reading vault contract data
 import { useState, useEffect, useCallback } from 'react';
-import { CHAIN_CONFIG, ADDRESSES } from '../config/constants';
+import { ADDRESSES } from '../config/constants';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
+import { callReadOnly, parseUintResult, principalToHex } from '../lib/stacks/contracts';
 
 interface VaultData {
   totalAssets: number;
@@ -15,49 +16,6 @@ interface VaultData {
 }
 
 const VAULT_CONTRACT = ADDRESSES.APEX_VAULT;
-
-async function callReadOnly(
-  contractId: string,
-  functionName: string,
-  args: any[] = [],
-  sender: string
-): Promise<any> {
-  const [contractAddress, contractName] = contractId.split('.');
-  
-  const response = await fetch(
-    `${CHAIN_CONFIG.stacks.apiUrl}/v2/contracts/call-read/${contractAddress}/${contractName}/${functionName}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sender,
-        arguments: args,
-      }),
-    }
-  );
-  
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
-  }
-  
-  const data = await response.json();
-  
-  if (!data.okay) {
-    throw new Error(data.cause || 'Contract call failed');
-  }
-  
-  return data.result;
-}
-
-function parseUintResult(result: string): number {
-  // Parse Clarity uint response
-  // Format: (ok u1000000) or just u1000000
-  const match = result.match(/u(\d+)/);
-  if (match) {
-    return parseInt(match[1]);
-  }
-  return 0;
-}
 
 export function useVaultData(): VaultData {
   const { isConnected, address } = useStacksWallet();
@@ -110,7 +68,7 @@ export function useVaultData(): VaultData {
           const userBalanceResult = await callReadOnly(
             VAULT_CONTRACT,
             'get-balance',
-            [`0x${Buffer.from(address).toString('hex')}`], // Principal as hex
+            [principalToHex(address)], // Properly encoded principal
             sender
           );
           userShares = parseUintResult(userBalanceResult);

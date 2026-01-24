@@ -1,24 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Rocket, CheckCircle, Loader2, TrendingUp } from 'lucide-react';
+import { Rocket, CheckCircle, Loader2, TrendingUp, RefreshCw } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
+import { useUSDCxBalance } from '../hooks/useUSDCxBalance';
 import { formatNumber, formatUSD } from '../lib/utils';
 import { ADDRESSES } from '../config/constants';
 
 interface DeployCapitalProps {
   isOpen: boolean;
   onClose: () => void;
-  usdcxBalance: number;
   onDeploySuccess?: () => void;
 }
 
-export function DeployCapital({ isOpen, onClose, usdcxBalance, onDeploySuccess }: DeployCapitalProps) {
+export function DeployCapital({ isOpen, onClose, onDeploySuccess }: DeployCapitalProps) {
   const [amount, setAmount] = useState('');
   const [isDepositing, setIsDepositing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { address: stacksAddress } = useStacksWallet();
+  
+  // Get real-time USDCx balance
+  const { balance: usdcxBalance, refetch: refetchUSDCx, isLoading: isLoadingUSDCx } = useUSDCxBalance();
 
   // Reset state when modal opens
   useEffect(() => {
@@ -58,6 +61,7 @@ export function DeployCapital({ isOpen, onClose, usdcxBalance, onDeploySuccess }
           console.log('Deposit TX submitted:', data.txId);
           setIsSuccess(true);
           setIsDepositing(false);
+          refetchUSDCx(); // Refresh balance after deposit
           onDeploySuccess?.();
         },
         onCancel: () => {
@@ -117,9 +121,19 @@ export function DeployCapital({ isOpen, onClose, usdcxBalance, onDeploySuccess }
             <>
               {/* Available Balance */}
               <div className="p-3 rounded-lg bg-secondary/50">
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Available USDCx</span>
-                  <span className="font-number font-semibold">{formatNumber(usdcxBalance, 2)}</span>
+                  <div className="flex items-center gap-1">
+                    <span className="font-number font-semibold">{formatNumber(usdcxBalance, 2)}</span>
+                    <button 
+                      onClick={refetchUSDCx}
+                      className="p-0.5 hover:bg-secondary rounded transition-colors ml-1"
+                      title="Refresh balance"
+                      disabled={isLoadingUSDCx}
+                    >
+                      <RefreshCw className={`h-3 w-3 ${isLoadingUSDCx ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
                 </div>
               </div>
 

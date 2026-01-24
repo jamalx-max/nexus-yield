@@ -1,6 +1,6 @@
 // Custom hook for bridge operations
 import { useState, useCallback } from 'react';
-import { useAccount, useWriteContract, useReadContract, useBalance } from 'wagmi';
+import { useAccount, useWriteContract, useReadContract, useBalance, usePublicClient } from 'wagmi';
 import { 
   X_RESERVE_ABI, 
   USDC_ABI, 
@@ -15,6 +15,7 @@ import { getFriendlyErrorMessage } from '../lib/utils';
 
 export function useBridge() {
   const { address: ethAddress } = useAccount();
+  const publicClient = usePublicClient();
   const [bridgeState, setBridgeState] = useState<BridgeState>({ status: 'idle' });
   
   // Contract write hooks
@@ -47,6 +48,7 @@ export function useBridge() {
    */
   const approveUSDC = useCallback(async (amount: string) => {
     if (!ethAddress) throw new Error('Wallet not connected');
+    if (!publicClient) throw new Error('Public client not available');
     
     setBridgeState({ status: 'approving' });
     
@@ -60,6 +62,10 @@ export function useBridge() {
         args: [ADDRESSES.X_RESERVE as `0x${string}`, amountWei],
       });
       
+      // Wait for transaction to be mined before updating state
+      await publicClient.waitForTransactionReceipt({ hash });
+      
+      // Only update state after transaction is confirmed
       setBridgeState({ status: 'approved', ethTxHash: hash });
       await refetchAllowance();
       
@@ -68,13 +74,14 @@ export function useBridge() {
       setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
       throw error;
     }
-  }, [ethAddress, writeApprove, refetchAllowance]);
+  }, [ethAddress, writeApprove, refetchAllowance, publicClient]);
 
   /**
    * Bridge USDC from Ethereum to Stacks
    */
   const bridgeToStacks = useCallback(async (amount: string, stacksRecipient: string) => {
     if (!ethAddress) throw new Error('Wallet not connected');
+    if (!publicClient) throw new Error('Public client not available');
     
     setBridgeState({ status: 'depositing', amount });
     
@@ -97,11 +104,21 @@ export function useBridge() {
         ],
       });
       
+      // Immediately show tracking UI after user signs (don't wait for mining)
       setBridgeState({ 
         status: 'pending_attestation', 
         ethTxHash: hash, 
         hookData,
         amount,
+      });
+      
+      // Wait for transaction confirmation in background
+      publicClient.waitForTransactionReceipt({ hash }).then(() => {
+        // Transaction confirmed, attestation can start
+        console.log('Bridge transaction confirmed:', hash);
+      }).catch((error) => {
+        console.error('Bridge transaction failed:', error);
+        setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
       });
       
       // Start polling for mint
@@ -120,7 +137,7 @@ export function useBridge() {
       setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
       throw error;
     }
-  }, [ethAddress, writeDeposit]);
+  }, [ethAddress, writeDeposit, publicClient]);
 
   /**
    * Check if sufficient allowance exists

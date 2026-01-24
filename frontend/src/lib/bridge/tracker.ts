@@ -13,13 +13,15 @@ export interface MintCheckResult {
 /**
  * Check if a USDCx mint has occurred for a given hookData
  * @param hookData - The unique hookData from the deposit
- * @param recipient - Optional recipient address to match
+ * @param _recipient - Optional recipient address (not used, kept for API compatibility)
  */
 export async function checkMintStatus(
   hookData: string,
-  recipient?: string
+  _recipient?: string
 ): Promise<MintCheckResult> {
   try {
+    console.log('🔍 Checking mint status for hookData:', hookData);
+    
     const response = await fetch(
       `${CHAIN_CONFIG.stacks.apiUrl}/extended/v1/contract/${USDCX_V1_TESTNET}/events?limit=50`
     );
@@ -29,6 +31,8 @@ export async function checkMintStatus(
     }
     
     const data = await response.json();
+    
+    console.log(`📊 Fetched ${data.results?.length || 0} events from USDCx contract`);
     
     // Find mint event matching hookData or recipient
     const mintEvent = data.results?.find((event: any) => {
@@ -40,21 +44,20 @@ export async function checkMintStatus(
       if (!repr.includes('(topic "mint")') && 
           !repr.includes('(topic \\"mint\\")')) return false;
       
-      // Match by hookData (most reliable)
+      // ONLY match by hookData (most reliable and prevents false positives)
       if (hookData && hookData !== '0x' && hookData.length > 2) {
         const hookDataClean = hookData.replace('0x', '').toLowerCase();
-        if (repr.toLowerCase().includes(`(hook-data 0x${hookDataClean})`)) {
-          return true;
+        const hasMatch = repr.toLowerCase().includes(`(hook-data 0x${hookDataClean})`);
+        
+        if (hasMatch) {
+          console.log('✅ Found matching mint event by hookData!', event.tx_id);
         }
+        
+        return hasMatch;
       }
       
-      // Fallback: match by recipient (Clarity principal format)
-      if (recipient) {
-        if (repr.includes(`(remote-recipient '${recipient})`)) {
-          return true;
-        }
-      }
-      
+      // If no hookData provided, don't match anything (prevent false positives)
+      console.warn('⚠️ No valid hookData provided, cannot match mint events');
       return false;
     });
     
@@ -71,6 +74,7 @@ export async function checkMintStatus(
       };
     }
     
+    console.log('⏳ No matching mint event found yet, will continue polling...');
     return { success: false };
   } catch (error) {
     console.error('Error checking mint status:', error);

@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ArrowDown, Zap, AlertCircle, Info } from 'lucide-react';
+import { ArrowDown, Zap, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { BridgeTracker } from './BridgeTracker';
 import { DeployCapital } from './DeployCapital';
 import { useBridge } from '../hooks/useBridge';
+import { useUSDCxBalance } from '../hooks/useUSDCxBalance';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useAccount } from 'wagmi';
 import { formatNumber } from '../lib/utils';
@@ -15,10 +16,13 @@ export function ZapFlow() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<'input' | 'tracking'>('input');
   const [showDeployModal, setShowDeployModal] = useState(false);
-  const [bridgedAmount, setBridgedAmount] = useState(0);
   
   const { isConnected: ethConnected } = useAccount();
   const { isConnected: stacksConnected, address: stacksAddress } = useStacksWallet();
+  
+  // Get USDCx balance on Stacks
+  const { balance: usdcxBalance, refetch: refetchUSDCx, isLoading: isLoadingUSDCx } = useUSDCxBalance();
+  
   const { 
     bridgeState, 
     usdcBalance,
@@ -52,7 +56,6 @@ export function ZapFlow() {
     if (!amount || !stacksAddress) return;
     
     try {
-      setBridgedAmount(Number(amount));
       await bridgeToStacks(amount, stacksAddress);
       setStep('tracking');
     } catch (error) {
@@ -70,7 +73,6 @@ export function ZapFlow() {
   const handleDeploySuccess = () => {
     // Reset everything after successful deployment
     setShowDeployModal(false);
-    setBridgedAmount(0);
     setAmount('');
     setStep('input');
     reset();
@@ -191,7 +193,26 @@ export function ZapFlow() {
 
                 {/* To */}
                 <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">To (Stacks Vault)</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm text-muted-foreground">To (Stacks Vault)</label>
+                    {stacksConnected && (
+                      <div className="flex items-center gap-1 text-xs">
+                        <span className="text-muted-foreground">
+                          Available: <span className="font-number font-semibold text-primary">
+                            {formatNumber(usdcxBalance, 2)} USDCx
+                          </span>
+                        </span>
+                        <button 
+                          onClick={refetchUSDCx}
+                          className="p-0.5 hover:bg-secondary rounded transition-colors"
+                          title="Refresh balance"
+                          disabled={isLoadingUSDCx}
+                        >
+                          <RefreshCw className={`h-3 w-3 ${isLoadingUSDCx ? 'animate-spin' : ''}`} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <div className="p-3 rounded-lg bg-secondary/50 border">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">You'll receive</span>
@@ -240,6 +261,7 @@ export function ZapFlow() {
                 bridgeState={bridgeState} 
                 stacksRecipient={stacksAddress || ''}
                 onComplete={handleBridgeComplete}
+                onMintDetected={refetchUSDCx}
               />
             )}
           </div>
@@ -250,7 +272,6 @@ export function ZapFlow() {
       <DeployCapital
         isOpen={showDeployModal}
         onClose={() => setShowDeployModal(false)}
-        usdcxBalance={bridgedAmount}
         onDeploySuccess={handleDeploySuccess}
       />
     </>
