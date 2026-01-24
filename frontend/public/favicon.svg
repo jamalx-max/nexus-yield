@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <!-- Background: Green skewed square -->
+  <rect x="5" y="0" width="30" height="40" fill="#10b981" transform="skewX(-10)" transform-origin="center" />
+  
+  <!-- Icon: CPU Chip (Black) -->
+  <g transform="translate(8, 8) scale(1) skewX(-10)" transform-origin="center" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <rect x="9" y="9" width="6" height="6" rx="1" />
+    <path d="M15 2v2" />
+    <path d="M15 20v2" />
+    <path d="M2 15h2" />
+    <path d="M2 9h2" />
+    <path d="M20 15h2" />
+    <path d="M20 9h2" />
+    <path d="M9 2v2" />
+    <path d="M9 20v2" />
+  </g>
+</svg>

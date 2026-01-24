@@ -2,6 +2,7 @@ import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { ArrowRight, Zap, Layers, Lock, ChevronRight, Cpu, Activity, TrendingUp, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ScrollAnimation } from './ui/scroll-animation';
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export function LandingPage() {
 
         {/* Hero Section */}
         <div className="py-20 lg:py-32 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8 relative z-20">
+          <ScrollAnimation variant="slideRight" className="space-y-8 relative z-20">
             <div className="inline-block px-3 py-1 border border-accent/30 bg-accent/5 text-accent font-mono text-xs mb-4">
               /// STACKS_BUILD_2026
             </div>
@@ -67,9 +68,9 @@ export function LandingPage() {
                 WHY?
               </Button>
             </div>
-          </div>
+          </ScrollAnimation>
 
-          <div className="relative">
+          <ScrollAnimation variant="slideLeft" className="relative">
             {/* Visual Abstract Chart */}
             <div className="relative z-10 bg-card border border-border p-6 md:p-8 skew-y-[-2deg] shadow-2xl shadow-primary/10 hover:skew-y-0 transition-transform duration-500">
               <div className="flex justify-between items-end mb-8">
@@ -99,11 +100,11 @@ export function LandingPage() {
             
             {/* Decorative Background Card */}
             <div className="absolute top-4 left-4 w-full h-full border-2 border-dashed border-secondary/30 -z-10 skew-y-[-2deg]" />
-          </div>
+          </ScrollAnimation>
         </div>
 
         {/* SECTION 2: THE OPPORTUNITY (Visual Yield Comparison) */}
-        <div className="py-16 border-t border-border/50">
+        <ScrollAnimation variant="fade" className="py-16 border-t border-border/50">
           <div className="text-center mb-12">
             <h2 className="font-heading text-3xl font-bold mb-4">THE OPPORTUNITY</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -155,10 +156,10 @@ export function LandingPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollAnimation>
 
         {/* SECTION 3: THE YIELD STACK (Zest + Bitflow) */}
-        <div className="py-24 border-t border-border/50 bg-secondary/5">
+        <ScrollAnimation variant="slideUp" className="py-24 border-t border-border/50 bg-secondary/5">
           <div className="text-center mb-16">
             <h2 className="font-heading text-4xl font-bold mb-6">THE YIELD STACK</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
@@ -251,10 +252,10 @@ export function LandingPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollAnimation>
 
         {/* SECTION 4: THE MECHANICS (Vault Logic) */}
-        <div className="py-16 border-t border-border/50">
+        <ScrollAnimation variant="scale" className="py-16 border-t border-border/50">
            <div className="bg-card/30 border border-border/50 rounded-lg p-8 md:p-12 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
             
@@ -293,10 +294,10 @@ export function LandingPage() {
               </p>
             </div>
           </div>
-        </div>
+        </ScrollAnimation>
 
         {/* SECTION 5: THE ARCHITECTURE */}
-        <div className="py-16 border-t border-border/50">
+        <ScrollAnimation variant="slideUp" className="py-16 border-t border-border/50">
           <div className="mb-12 text-center">
             <h2 className="font-heading text-3xl font-bold mb-4">THE ARCHITECTURE</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -351,7 +352,7 @@ export function LandingPage() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </ScrollAnimation>
 
         {/* Footer */}
         <footer className="py-12 border-t border-border/50 flex justify-between items-center text-sm text-muted-foreground">

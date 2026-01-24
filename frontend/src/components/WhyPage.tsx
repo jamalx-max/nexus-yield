@@ -2,6 +2,7 @@ import { ArrowRight, TrendingUp, ShieldCheck, Zap, ChevronRight, Activity } from
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Link, useNavigate } from 'react-router-dom';
+import { ScrollAnimation } from './ui/scroll-animation';
 
 export function WhyPage() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export function WhyPage() {
 
         {/* Hero Section */}
         <div className="grid lg:grid-cols-2 gap-16 mb-24 items-center">
-          <div>
+          <ScrollAnimation variant="slideRight">
             <div className="inline-block px-3 py-1 border border-destructive/30 bg-destructive/5 text-destructive font-mono text-xs mb-4">
               /// MARKET_ALERT: SATURATION_DETECTED
             </div>
@@ -41,10 +42,10 @@ export function WhyPage() {
             <Button onClick={() => navigate('/dashboard')} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none h-14 px-8 font-bold text-lg skew-x-[-5deg]">
               DEPLOY_CAPITAL <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-          </div>
+          </ScrollAnimation>
 
           {/* Comparative Chart */}
-          <div className="relative">
+          <ScrollAnimation variant="slideLeft" className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl rounded-full opacity-30" />
             <Card className="bg-card/50 backdrop-blur-sm border-border relative overflow-hidden">
               <CardContent className="p-8">
@@ -99,11 +100,11 @@ export function WhyPage() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </ScrollAnimation>
         </div>
 
         {/* The Strategy Section */}
-        <div className="mb-24">
+        <ScrollAnimation variant="fade" className="mb-24">
           <div className="text-center mb-16">
             <h2 className="font-heading text-3xl font-bold mb-4">THE STRATEGY</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -200,10 +201,10 @@ export function WhyPage() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </ScrollAnimation>
 
         {/* How It Works (The Logic) */}
-        <div className="bg-card/30 border border-border/50 rounded-lg p-8 md:p-12">
+        <ScrollAnimation variant="scale" className="bg-card/30 border border-border/50 rounded-lg p-8 md:p-12">
           <h2 className="font-heading text-2xl font-bold mb-8 text-center">THE VAULT LOGIC</h2>
           
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
@@ -238,17 +239,17 @@ export function WhyPage() {
               Your <span className="font-mono text-foreground">apUSDC</span> is now worth more USDC than when you started.
             </p>
           </div>
-        </div>
+        </ScrollAnimation>
 
         {/* Footer CTA */}
-        <div className="mt-24 text-center">
+        <ScrollAnimation variant="slideUp" className="mt-24 text-center">
           <p className="font-mono text-sm text-muted-foreground mb-6">
             /// READY_TO_INITIATE_SEQUENCE?
           </p>
           <Button onClick={() => navigate('/dashboard')} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none h-16 px-12 font-bold text-xl skew-x-[-5deg] shadow-lg shadow-primary/20">
             LAUNCH APP_
           </Button>
-        </div>
+        </ScrollAnimation>
       </div>
     </div>
   );

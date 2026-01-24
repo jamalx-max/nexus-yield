@@ -218,7 +218,7 @@ export function Dashboard() {
         <div className="flex items-start gap-4">
           <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <div className="text-sm font-mono">
-            <p className="font-bold text-primary uppercase mb-1">SYSTEM_NOTICE: HACKATHON_ENV</p>
+            <p className="font-bold text-primary uppercase mb-1">SYSTEM_NOTICE: DEMO_MODE</p>
             <p className="text-muted-foreground">
               Connected to <strong className="text-foreground">Circle USDCx Mainnet</strong> (Bridged via CCTP). 
               Yield simulation active (10bps/100blocks). 
