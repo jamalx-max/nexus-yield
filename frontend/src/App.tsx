@@ -2,12 +2,27 @@ import { useState } from 'react'
 import { Navbar } from './components/layout'
 import { Dashboard } from './components/Dashboard'
 import { LandingPage } from './components/LandingPage'
+import { WhyPage } from './components/WhyPage'
 
 function App() {
-  const [view, setView] = useState<'landing' | 'dashboard'>('landing')
+  const [view, setView] = useState<'landing' | 'dashboard' | 'why'>('landing')
 
   if (view === 'landing') {
-    return <LandingPage onLaunch={() => setView('dashboard')} />
+    return (
+      <LandingPage 
+        onLaunch={() => setView('dashboard')} 
+        onWhy={() => setView('why')}
+      />
+    )
+  }
+
+  if (view === 'why') {
+    return (
+      <WhyPage 
+        onDeploy={() => setView('dashboard')}
+        onBack={() => setView('landing')}
+      />
+    )
   }
 
   return (

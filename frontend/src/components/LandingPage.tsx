@@ -4,9 +4,10 @@ import { ArrowRight, Zap, Layers, Lock, ChevronRight, Cpu } from 'lucide-react';
 
 interface LandingPageProps {
   onLaunch: () => void;
+  onWhy: () => void;
 }
 
-export function LandingPage({ onLaunch }: LandingPageProps) {
+export function LandingPage({ onLaunch, onWhy }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Abstract Background Elements */}
@@ -62,9 +63,10 @@ export function LandingPage({ onLaunch }: LandingPageProps) {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-border hover:border-accent text-muted-foreground hover:text-accent font-mono h-14 rounded-none skew-x-[-5deg]"
+                onClick={onWhy}
+                className="border-border hover:bg-accent hover:text-accent-foreground text-muted-foreground font-mono h-14 rounded-none skew-x-[-5deg] transition-all"
               >
-                READ_DOCS
+                WHY?
               </Button>
             </div>
           </div>
