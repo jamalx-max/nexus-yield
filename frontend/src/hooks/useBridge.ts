@@ -11,6 +11,7 @@ import {
 } from '../lib/bridge';
 import { stacksAddressToBytes32, generateHookData } from '../lib/bridge/address';
 import { pollForMint } from '../lib/bridge/tracker';
+import { getFriendlyErrorMessage } from '../lib/utils';
 
 export function useBridge() {
   const { address: ethAddress } = useAccount();
@@ -64,7 +65,7 @@ export function useBridge() {
       
       return hash;
     } catch (error: any) {
-      setBridgeState({ status: 'failed', error: error.message });
+      setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
       throw error;
     }
   }, [ethAddress, writeApprove, refetchAllowance]);
@@ -116,7 +117,7 @@ export function useBridge() {
       
       return { hash, hookData };
     } catch (error: any) {
-      setBridgeState({ status: 'failed', error: error.message });
+      setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
       throw error;
     }
   }, [ethAddress, writeDeposit]);
