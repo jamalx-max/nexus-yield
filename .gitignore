@@ -4,3 +4,13 @@ idea.md
 prd.md
 BRIDGE_GUIDE.md
 VIDEO_SCRIPT.md
+hackathon_info.txt
+DEPLOYMENT.md
+
+# Dependencies & Build
+node_modules
+.cache/
+.opencode/
+.shared/
+.vscode/
+stacks/
