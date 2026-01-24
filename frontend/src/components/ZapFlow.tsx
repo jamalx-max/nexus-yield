@@ -52,12 +52,11 @@ export function ZapFlow() {
     if (!amount || !stacksAddress) return;
     
     try {
-      setStep('tracking');
       setBridgedAmount(Number(amount));
       await bridgeToStacks(amount, stacksAddress);
+      setStep('tracking');
     } catch (error) {
       console.error('Bridge failed:', error);
-      setStep('input');
     }
   };
 
@@ -112,6 +111,19 @@ export function ZapFlow() {
                   <p className="text-muted-foreground">
                     {!ethConnected && 'Connect your Ethereum wallet. '}
                     {!stacksConnected && 'Connect your Stacks wallet.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Error Status */}
+            {bridgeState.status === 'failed' && (
+              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-destructive">Transaction Failed</p>
+                  <p className="text-muted-foreground text-xs break-all">
+                    {bridgeState.error || 'User rejected request or transaction failed.'}
                   </p>
                 </div>
               </div>
