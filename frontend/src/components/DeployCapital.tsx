@@ -40,7 +40,13 @@ export function DeployCapital({ isOpen, onClose, onDeploySuccess }: DeployCapita
     try {
       // Import Stacks transaction libraries dynamically
       const { openContractCall } = await import('@stacks/connect');
-      const { uintCV, PostConditionMode, Pc } = await import('@stacks/transactions');
+      const { 
+        uintCV, 
+        PostConditionMode, 
+        makeStandardFungiblePostCondition,
+        FungibleConditionCode,
+        createAssetInfo 
+      } = await import('@stacks/transactions');
 
       const amountMicroUsdc = Math.floor(Number(amount) * 1_000_000);
       const [vaultAddress, vaultName] = ADDRESSES.APEX_VAULT.split('.');
@@ -53,9 +59,12 @@ export function DeployCapital({ isOpen, onClose, onDeploySuccess }: DeployCapita
         functionArgs: [uintCV(amountMicroUsdc)],
         postConditionMode: PostConditionMode.Deny,
         postConditions: [
-          Pc.principal(stacksAddress)
-            .willSendLte(amountMicroUsdc)
-            .ft(`${tokenAddress}.${tokenName}`, 'usdcx'),
+          makeStandardFungiblePostCondition(
+            stacksAddress,
+            FungibleConditionCode.LessEqual,
+            amountMicroUsdc,
+            createAssetInfo(tokenAddress, tokenName, 'usdcx-token')
+          ),
         ],
         onFinish: (data) => {
           console.log('Deposit TX submitted:', data.txId);
@@ -71,6 +80,7 @@ export function DeployCapital({ isOpen, onClose, onDeploySuccess }: DeployCapita
       });
     } catch (error) {
       console.error('Deploy failed:', error);
+      alert(`Deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsDepositing(false);
     }
   }, [stacksAddress, amount, onDeploySuccess]);
