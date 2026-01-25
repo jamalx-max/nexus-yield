@@ -8,6 +8,9 @@ export const ADDRESSES = {
   // Real Circle USDCx token (bridged from Ethereum via CCTP)
   USDCX_TOKEN: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx' as const,
   
+  // USDCx v1 contract for burn/withdrawal operations
+  USDCX_V1: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx-v1' as const,
+  
   // Real vault that uses Circle USDCx
   APEX_VAULT: 'STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.apex-vault-real' as const,
   
@@ -19,7 +22,9 @@ export const ADDRESSES = {
   REAL_USDCX: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx' as const,
 } as const;
 
+// Domain IDs for Circle xReserve cross-chain messaging
 export const STACKS_DOMAIN = 10003;
+export const ETHEREUM_DOMAIN = 0;
 
 export const CHAIN_CONFIG = {
   ethereum: {

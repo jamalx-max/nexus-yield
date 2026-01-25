@@ -1,0 +1,1 @@
+Ethereum has $25B in lazy USDC. Stacks has 12%+ yields but no liquidity. Apex Yield is the arbitrage engine connecting them. Using Circle CCTP, we zap ETH USDC directly into Bitcoin-secured yield vaults on Stacks. One click. Zero slippage. Real yield.
