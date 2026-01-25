@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { Navbar } from './components/layout/Navbar'
 import { Dashboard } from './components/Dashboard'
@@ -10,7 +9,6 @@ function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <Toaster />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/why" element={<WhyPage />} />

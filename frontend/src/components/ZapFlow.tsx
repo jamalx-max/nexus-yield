@@ -10,7 +10,6 @@ import { useUSDCxBalance } from '../hooks/useUSDCxBalance';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useAccount } from 'wagmi';
 import { formatNumber } from '../lib/utils';
-import { showToast } from '../lib/toast';
 
 export function ZapFlow() {
   const [amount, setAmount] = useState('');
@@ -50,7 +49,7 @@ export function ZapFlow() {
       // After success, button will naturally switch to "Bridge" due to hasAllowance check
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      showToast.error(`Approval failed: ${errorMessage}`);
+      console.error(`Approval failed: ${errorMessage}`);
     }
   };
 
@@ -62,13 +61,13 @@ export function ZapFlow() {
       setStep('tracking');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      showToast.error(`Bridge failed: ${errorMessage}`);
+      console.error(`Bridge failed: ${errorMessage}`);
     }
   };
 
   const handleBridgeComplete = () => {
     // Bridge completed - close zap modal and show deploy modal
-    showToast.success('USDCx successfully minted on Stacks!');
+    console.log('USDCx successfully minted on Stacks!');
     setIsOpen(false);
     setShowDeployModal(true);
   };

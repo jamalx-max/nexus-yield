@@ -11,7 +11,6 @@ import { useBridge } from '../hooks/useBridge';
 import { ZapFlow } from './ZapFlow';
 import { YieldChart } from './YieldChart';
 import { ADDRESSES } from '../config/constants';
-import { showToast, shortenTxHash } from '../lib/toast';
 import { CountUp } from './ui/count-up';
 
 export function Dashboard() {
@@ -92,20 +91,20 @@ export function Dashboard() {
           ),
         ],
         onFinish: (data) => {
-          showToast.success(`Deposit submitted! TX: ${shortenTxHash(data.txId)}`);
+          console.log(`Deposit submitted! TX: ${data.txId}`);
           setIsDepositing(false);
           setDepositAmount('');
           refetchUSDCx();
           vaultData.refetch(); // Refresh vault data (TVL, shares, etc.)
         },
         onCancel: () => {
-          showToast.info('Deposit cancelled');
+          console.log('Deposit cancelled');
           setIsDepositing(false);
         },
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      showToast.error(`Deposit failed: ${errorMessage}`);
+      console.error(`Deposit failed: ${errorMessage}`);
       setIsDepositing(false);
     }
   };
@@ -132,19 +131,19 @@ export function Dashboard() {
         functionArgs: [uintCV(sharesInMicro)],
         postConditionMode: PostConditionMode.Allow,
         onFinish: (data) => {
-          showToast.success(`Withdrawal submitted! TX: ${shortenTxHash(data.txId)}`);
+          console.log(`Withdrawal submitted! TX: ${data.txId}`);
           setIsWithdrawing(false);
           refetchUSDCx(); // Refresh USDCx balance (user now has more)
           vaultData.refetch(); // Refresh vault data (TVL, shares, etc.)
         },
         onCancel: () => {
-          showToast.info('Withdrawal cancelled');
+          console.log('Withdrawal cancelled');
           setIsWithdrawing(false);
         },
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      showToast.error(`Withdrawal failed: ${errorMessage}`);
+      console.error(`Withdrawal failed: ${errorMessage}`);
       setIsWithdrawing(false);
     }
   };
