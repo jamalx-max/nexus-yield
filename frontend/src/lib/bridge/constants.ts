@@ -1,6 +1,6 @@
 // Bridge constants and ABIs for Circle xReserve integration
 import { parseUnits } from 'viem';
-import { ADDRESSES, STACKS_DOMAIN } from '../../config/constants';
+import { ADDRESSES, STACKS_DOMAIN, ETHEREUM_DOMAIN } from '../../config/constants';
 
 // xReserve ABI (minimal for deposit)
 export const X_RESERVE_ABI = [
@@ -51,7 +51,7 @@ export const USDC_ABI = [
   },
 ] as const;
 
-// Bridge status types
+// Bridge status types (Ethereum -> Stacks deposit)
 export type BridgeStatus = 
   | 'idle'
   | 'approving'
@@ -71,6 +71,31 @@ export interface BridgeState {
   error?: string;
 }
 
+// Withdrawal status types (Stacks -> Ethereum withdrawal)
+export type WithdrawStatus =
+  | 'idle'
+  | 'burning'
+  | 'pending_attestation'
+  | 'completed'
+  | 'failed';
+
+export interface WithdrawState {
+  status: WithdrawStatus;
+  stacksTxId?: string;
+  amount?: string;
+  ethRecipient?: string;
+  error?: string;
+}
+
+// Minimum withdrawal amount (4.80 USDCx covers the fee)
+export const MIN_WITHDRAW_AMOUNT = 4.80;
+
+// Estimated withdrawal times
+export const WITHDRAW_TIME_ESTIMATES = {
+  testnet: '~25 minutes',
+  mainnet: '~60 minutes',
+} as const;
+
 // Helper to format USDC amount (6 decimals)
 export function parseUSDC(amount: string): bigint {
   return parseUnits(amount, 6);
@@ -80,4 +105,4 @@ export function formatUSDC(amount: bigint): string {
   return (Number(amount) / 1_000_000).toFixed(2);
 }
 
-export { ADDRESSES, STACKS_DOMAIN };
+export { ADDRESSES, STACKS_DOMAIN, ETHEREUM_DOMAIN };

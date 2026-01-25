@@ -9,9 +9,11 @@ import { useAccount } from 'wagmi';
 import { useVaultData, useUSDCxBalance } from '../hooks';
 import { useBridge } from '../hooks/useBridge';
 import { ZapFlow } from './ZapFlow';
+import { WithdrawFlow } from './WithdrawFlow';
 import { YieldChart } from './YieldChart';
 import { ADDRESSES } from '../config/constants';
 import { CountUp } from './ui/count-up';
+import { MIN_WITHDRAW_AMOUNT } from '../lib/bridge';
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
@@ -208,6 +210,18 @@ export function Dashboard() {
               </p>
             </div>
           </div>
+
+          {/* Withdraw to Ethereum button - Show when user has USDCx balance */}
+          {stacksConnected && ethConnected && usdcxBalance >= MIN_WITHDRAW_AMOUNT && (
+            <div className="mt-4 pt-4 border-t border-border/30">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-mono text-muted-foreground">
+                  <span className="text-primary">TIP:</span> Withdraw USDCx to Ethereum as USDC
+                </div>
+                <WithdrawFlow className="h-8 text-xs" />
+              </div>
+            </div>
+          )}
         </div>
       )}
 

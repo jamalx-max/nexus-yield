@@ -174,7 +174,7 @@ export function BridgeTracker({ bridgeState, stacksRecipient, onComplete, onMint
               <p className="text-sm font-medium">Mint USDCx on Stacks</p>
               {stacksTxId && (
                 <a 
-                  href={`${CHAIN_CONFIG.stacks.explorerUrl}&txId=${stacksTxId}`}
+                  href={`https://explorer.hiro.so/txid/${stacksTxId}?chain=testnet`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-primary hover:underline flex items-center gap-1"
