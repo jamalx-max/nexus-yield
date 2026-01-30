@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowDown, Zap, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowDown, Zap, AlertCircle, RefreshCw, Info } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { BridgeTracker } from './BridgeTracker';
 import { DeployCapital } from './DeployCapital';
 import { useBridge } from '../hooks/useBridge';
@@ -10,6 +11,7 @@ import { useUSDCxBalance } from '../hooks/useUSDCxBalance';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
 import { useAccount } from 'wagmi';
 import { formatNumber } from '../lib/utils';
+import { saveTransaction } from '../lib/history';
 
 export function ZapFlow() {
   const [amount, setAmount] = useState('');
@@ -57,7 +59,20 @@ export function ZapFlow() {
     if (!amount || !stacksAddress) return;
     
     try {
-      await bridgeToStacks(amount, stacksAddress);
+      const result = await bridgeToStacks(amount, stacksAddress);
+      
+      // Save transaction history
+      if (result && result.hash) {
+        saveTransaction({
+          id: result.hookData || crypto.randomUUID(),
+          type: 'deposit',
+          amount,
+          timestamp: Date.now(),
+          status: 'pending',
+          txHash: result.hash,
+        });
+      }
+      
       setStep('tracking');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -221,6 +236,22 @@ export function ZapFlow() {
                       <span className="font-number font-semibold">
                         ~{amount || '0'} USDCx
                       </span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                      <div className="flex items-center gap-1">
+                        <span>Bridge fee</span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="h-3 w-3 text-muted-foreground hover:text-primary cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Standard network gas fees apply.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <span>~Gas Only</span>
                     </div>
                     {stacksAddress && (
                       <p className="text-xs text-muted-foreground mt-2">

@@ -14,6 +14,9 @@ import { YieldChart } from './YieldChart';
 import { ADDRESSES } from '../config/constants';
 import { CountUp } from './ui/count-up';
 import { MIN_WITHDRAW_AMOUNT } from '../lib/bridge';
+import { TransactionHistory } from './TransactionHistory';
+import { NetworkGuard } from './NetworkGuard';
+import { AddTokenButton } from './AddTokenButton';
 import { EarningsSimulator } from './EarningsSimulator';
 import { APYComparison } from './APYComparison';
 
@@ -199,11 +202,16 @@ export function Dashboard() {
                 {ethConnected ? formatNumber(ethBalance, 4) : '--'}
               </p>
             </div>
-            <div className="p-3 bg-background/50 border border-border/30">
+            <div className="p-3 bg-background/50 border border-border/30 relative group">
               <p className="text-muted-foreground text-xs mb-1">USDC (Sepolia)</p>
               <p className="font-semibold text-lg">
                 {ethConnected ? formatNumber(usdcBalance, 2) : '--'}
               </p>
+              {ethConnected && (
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <AddTokenButton />
+                </div>
+              )}
             </div>
             <div className="p-3 bg-background/50 border border-primary/20">
               <p className="text-muted-foreground text-xs mb-1">USDCx (Stacks)</p>
@@ -212,6 +220,9 @@ export function Dashboard() {
               </p>
             </div>
           </div>
+
+          {/* Transaction History */}
+          <TransactionHistory />
 
           {/* Withdraw to Ethereum button - Show when user has USDCx balance */}
           {stacksConnected && ethConnected && usdcxBalance >= MIN_WITHDRAW_AMOUNT && (
@@ -505,6 +516,7 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+      <NetworkGuard />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowDown, ArrowDownToLine, AlertCircle, ExternalLink, Clock, CheckCircle2 } from 'lucide-react';
+import { ArrowDown, ArrowDownToLine, AlertCircle, ExternalLink, Clock, CheckCircle2, Info } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { useWithdraw } from '../hooks/useWithdraw';
 import { useUSDCxBalance } from '../hooks/useUSDCxBalance';
 import { useStacksWallet } from '../providers/StacksWalletProvider';
@@ -10,6 +11,7 @@ import { useAccount } from 'wagmi';
 import { formatNumber } from '../lib/utils';
 import { WITHDRAW_TIME_ESTIMATES } from '../lib/bridge';
 import { shortenTxHash } from '../lib/bridge/address';
+import { saveTransaction } from '../lib/history';
 
 interface WithdrawFlowProps {
   className?: string;
@@ -43,11 +45,40 @@ export function WithdrawFlow({ className }: WithdrawFlowProps) {
     
     try {
       await withdrawToEthereum(amount, ethAddress);
+      
+      // Save pending transaction
+      saveTransaction({
+        id: crypto.randomUUID(),
+        type: 'withdraw',
+        amount,
+        timestamp: Date.now(),
+        status: 'pending',
+        txHash: '', // Stacks TX ID comes from hook state updates, handled in hook? 
+        // Actually hook doesn't return TX ID in promise, it updates state. 
+        // We can't get it here easily without refactoring hook. 
+        // For now we'll save it when we detect state change or just save "pending".
+      });
+      // Correction: useWithdraw updates state. We can effect on state change?
+      // Or just save generic pending.
+      
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error(`Withdrawal failed: ${errorMessage}`);
     }
   };
+
+  // Effect to save TX when we get a Stacks TX ID
+  if (withdrawState.status === 'pending_attestation' && withdrawState.stacksTxId && !localStorage.getItem(`tx_${withdrawState.stacksTxId}`)) {
+     saveTransaction({
+        id: withdrawState.stacksTxId,
+        type: 'withdraw',
+        amount: withdrawState.amount || '0',
+        timestamp: Date.now(),
+        status: 'pending',
+        txHash: withdrawState.stacksTxId
+     });
+     localStorage.setItem(`tx_${withdrawState.stacksTxId}`, 'saved');
+  }
 
   const handleClose = () => {
     setIsOpen(false);
@@ -190,7 +221,19 @@ export function WithdrawFlow({ className }: WithdrawFlowProps) {
                       </span>
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                      <span>Bridge fee</span>
+                      <div className="flex items-center gap-1">
+                        <span>Bridge fee</span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="h-3 w-3 text-muted-foreground hover:text-primary cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Includes Stacks gas fees + Circle attestation cost.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <span>~${withdrawFee.toFixed(2)}</span>
                     </div>
                     {ethAddress && (
