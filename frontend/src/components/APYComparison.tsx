@@ -1,6 +1,5 @@
 import { BarChart3, Building2, Landmark } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { formatCurrency } from '../lib/yield-math';
 
 interface APYComparisonProps {
   apexApy: number;

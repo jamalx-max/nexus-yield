@@ -14,6 +14,8 @@ import { YieldChart } from './YieldChart';
 import { ADDRESSES } from '../config/constants';
 import { CountUp } from './ui/count-up';
 import { MIN_WITHDRAW_AMOUNT } from '../lib/bridge';
+import { EarningsSimulator } from './EarningsSimulator';
+import { APYComparison } from './APYComparison';
 
 export function Dashboard() {
   const [depositAmount, setDepositAmount] = useState('');
@@ -312,6 +314,8 @@ export function Dashboard() {
             />
           </div>
 
+          <EarningsSimulator apy={vaultData.apy} />
+
           {/* User Position Card */}
           {stacksConnected && vaultData.userShares > 0 && (
             <div className="cyber-card p-6 border-l-4 border-l-primary">
@@ -478,6 +482,8 @@ export function Dashboard() {
               )}
             </div>
           </div>
+          
+          <APYComparison apexApy={vaultData.apy} />
 
           {/* Quick Info */}
           <div className="cyber-card p-4 bg-muted/20">
