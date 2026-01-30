@@ -37,6 +37,15 @@ The vault deploys capital into two primary strategies:
 
 *Note: In the current Testnet Demo, yields are simulated based on mainnet projections.*
 
+## 📜 Contract Addresses (Testnet)
+
+| Contract | Address |
+|----------|---------|
+| **USDC (Sepolia)** | `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` |
+| **xReserve (Bridge)** | `0x008888878f94C0d87defdf0B07f46B93C1934442` |
+| **USDCx (Stacks)** | `ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.usdcx` |
+| **Apex Vault** | `STZ5Q1C2GVSMCWS9NWVDEKHNW04THC75SEGDHS74.apex-vault-real` |
+
 ## 💰 Revenue Model (Mainnet)
 
 Apex Yield is designed as a sustainable business, operating like a decentralized hedge fund.
