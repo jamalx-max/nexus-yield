@@ -16,8 +16,10 @@ export function useWithdraw() {
   const [withdrawState, setWithdrawState] = useState<WithdrawState>({ status: 'idle' });
 
   /**
-   * Withdraw USDCx from Stacks to USDC on Ethereum
-   * Calls the burn function on the usdcx-v1 contract
+   * Withdraw USDCx from Stacks to USDC on Ethereum.
+   * Calls the burn function on the usdcx-v1 contract.
+   * @param amount - Amount of USDCx to withdraw
+   * @param ethRecipient - Optional Ethereum recipient address (defaults to connected wallet)
    */
   const withdrawToEthereum = useCallback(async (amount: string, ethRecipient?: string) => {
     if (!stacksAddress) throw new Error('Stacks wallet not connected');

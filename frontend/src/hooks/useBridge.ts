@@ -44,7 +44,9 @@ export function useBridge() {
   });
 
   /**
-   * Approve USDC spending for xReserve
+   * Approve USDC spending for xReserve contract.
+   * @param amount - Amount of USDC to approve (in human readable format, e.g. "1.0")
+   * @returns Transaction hash of approval
    */
   const approveUSDC = useCallback(async (amount: string) => {
     if (!ethAddress) throw new Error('Wallet not connected');
@@ -77,7 +79,10 @@ export function useBridge() {
   }, [ethAddress, writeApprove, refetchAllowance, publicClient]);
 
   /**
-   * Bridge USDC from Ethereum to Stacks
+   * Bridge USDC from Ethereum to Stacks via Circle CCTP.
+   * @param amount - Amount to bridge (in human readable format)
+   * @param stacksRecipient - Recipient Stacks address (e.g. ST1...)
+   * @returns Object containing transaction hash and hook data
    */
   const bridgeToStacks = useCallback(async (amount: string, stacksRecipient: string) => {
     if (!ethAddress) throw new Error('Wallet not connected');
