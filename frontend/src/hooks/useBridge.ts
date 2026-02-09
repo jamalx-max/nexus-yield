@@ -13,11 +13,14 @@ import { stacksAddressToBytes32, generateHookData } from '../lib/bridge/address'
 import { pollForMint } from '../lib/bridge/tracker';
 import { getParsedError } from '../lib/utils';
 import { ERROR_MESSAGES } from '../lib/errors';
+import { TransactionType, TransactionStatus } from '../lib/transactions';
+import { useTransactionTrackerContext } from '../providers/TransactionTrackerProvider';
 
 export function useBridge() {
   const { address: ethAddress } = useAccount();
   const publicClient = usePublicClient();
   const [bridgeState, setBridgeState] = useState<BridgeState>({ status: 'idle' });
+  const { addTransaction, trackTransaction } = useTransactionTrackerContext();
   
   // Contract write hooks
   const { writeContractAsync: writeApprove } = useWriteContract();
