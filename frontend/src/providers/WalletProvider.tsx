@@ -2,13 +2,36 @@ import React from 'react';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { wagmiConfig } from '../config/wagmi';
-import '@rainbow-me/rainbowkit/styles.css';
+import { config } from '../config/wagmi';
+import { useWalletPersistence } from '../hooks/useWalletPersistence';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-interface WalletProviderProps {
-  children: React.ReactNode;
+/**
+ * Wallet persistence wrapper component
+ * Must be inside WagmiProvider to access wallet state
+ */
+function WalletPersistenceWrapper({ children }: { children: React.ReactNode }) {
+  useWalletPersistence();
+  return <>{children}</>;
+}
+
+export function WalletProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <WalletPersistenceWrapper>
+          {children}
+        </WalletPersistenceWrapper>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
 }
 
 export function WalletProvider({ children }: WalletProviderProps) {

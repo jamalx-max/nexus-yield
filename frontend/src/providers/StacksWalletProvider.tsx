@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { showConnect } from '@stacks/connect';
 import { userSession, stacksAuthOptions } from '../config/stacks';
+import { useStacksWalletPersistence } from '../hooks/useStacksWalletPersistence';
 
 interface StacksWalletContextType {
   isConnected: boolean;
@@ -28,14 +29,6 @@ export function StacksWalletProvider({ children }: StacksWalletProviderProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (userSession.isUserSignedIn()) {
-      const userData = userSession.loadUserData();
-      setIsConnected(true);
-      setAddress(userData.profile.stxAddress.testnet);
-    }
-  }, []);
-
   const handleConnect = useCallback(() => {
     showConnect({
       ...stacksAuthOptions,
@@ -53,6 +46,22 @@ export function StacksWalletProvider({ children }: StacksWalletProviderProps) {
     userSession.signUserOut();
     setIsConnected(false);
     setAddress(null);
+  }, []);
+
+  // Enable wallet persistence
+  useStacksWalletPersistence({
+    address: address || undefined,
+    isConnected,
+    connect: handleConnect,
+    disconnect: handleDisconnect,
+  });
+
+  useEffect(() => {
+    if (userSession.isUserSignedIn()) {
+      const userData = userSession.loadUserData();
+      setIsConnected(true);
+      setAddress(userData.profile.stxAddress.testnet);
+    }
   }, []);
 
   return (
