@@ -11,7 +11,8 @@ import {
 } from '../lib/bridge';
 import { stacksAddressToBytes32, generateHookData } from '../lib/bridge/address';
 import { pollForMint } from '../lib/bridge/tracker';
-import { getFriendlyErrorMessage } from '../lib/utils';
+import { getParsedError } from '../lib/utils';
+import { ERROR_MESSAGES } from '../lib/errors';
 
 export function useBridge() {
   const { address: ethAddress } = useAccount();
@@ -49,8 +50,16 @@ export function useBridge() {
    * @returns Transaction hash of approval
    */
   const approveUSDC = useCallback(async (amount: string) => {
-    if (!ethAddress) throw new Error('Wallet not connected');
-    if (!publicClient) throw new Error('Public client not available');
+    if (!ethAddress) {
+      const error = new Error(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
+      setBridgeState({ status: 'failed', error: error.message });
+      throw error;
+    }
+    if (!publicClient) {
+      const error = new Error(ERROR_MESSAGES.RPC_ERROR);
+      setBridgeState({ status: 'failed', error: error.message });
+      throw error;
+    }
     
     setBridgeState({ status: 'approving' });
     
@@ -73,7 +82,13 @@ export function useBridge() {
       
       return hash;
     } catch (error: any) {
-      setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
+      const parsedError = getParsedError(error);
+      setBridgeState({ 
+        status: 'failed', 
+        error: parsedError.message,
+        errorCategory: parsedError.category,
+        errorSeverity: parsedError.severity,
+      });
       throw error;
     }
   }, [ethAddress, writeApprove, refetchAllowance, publicClient]);
@@ -85,8 +100,31 @@ export function useBridge() {
    * @returns Object containing transaction hash and hook data
    */
   const bridgeToStacks = useCallback(async (amount: string, stacksRecipient: string) => {
-    if (!ethAddress) throw new Error('Wallet not connected');
-    if (!publicClient) throw new Error('Public client not available');
+    if (!ethAddress) {
+      const error = new Error(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
+      setBridgeState({ status: 'failed', error: error.message });
+      throw error;
+    }
+    if (!publicClient) {
+      const error = new Error(ERROR_MESSAGES.RPC_ERROR);
+      setBridgeState({ status: 'failed', error: error.message });
+      throw error;
+    }
+
+    // Validate amount
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      const error = new Error(ERROR_MESSAGES.INVALID_AMOUNT);
+      setBridgeState({ status: 'failed', error: error.message });
+      throw error;
+    }
+
+    // Validate Stacks address format
+    if (!stacksRecipient || (!stacksRecipient.startsWith('ST') && !stacksRecipient.startsWith('SP'))) {
+      const error = new Error(ERROR_MESSAGES.INVALID_ADDRESS);
+      setBridgeState({ status: 'failed', error: error.message });
+      throw error;
+    }
     
     setBridgeState({ status: 'depositing', amount });
     
@@ -123,7 +161,13 @@ export function useBridge() {
         console.log('Bridge transaction confirmed:', hash);
       }).catch((error) => {
         console.error('Bridge transaction failed:', error);
-        setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
+        const parsedError = getParsedError(error);
+        setBridgeState({ 
+          status: 'failed', 
+          error: parsedError.message,
+          errorCategory: parsedError.category,
+          errorSeverity: parsedError.severity,
+        });
       });
       
       // Start polling for mint
@@ -139,7 +183,13 @@ export function useBridge() {
       
       return { hash, hookData };
     } catch (error: any) {
-      setBridgeState({ status: 'failed', error: getFriendlyErrorMessage(error) });
+      const parsedError = getParsedError(error);
+      setBridgeState({ 
+        status: 'failed', 
+        error: parsedError.message,
+        errorCategory: parsedError.category,
+        errorSeverity: parsedError.severity,
+      });
       throw error;
     }
   }, [ethAddress, writeDeposit, publicClient]);

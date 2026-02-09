@@ -64,11 +64,13 @@ export type BridgeStatus =
 
 export interface BridgeState {
   status: BridgeStatus;
-  ethTxHash?: string;
+  ethTxHash?: `0x${string}`;
   stacksTxId?: string;
-  hookData?: string;
+  hookData?: `0x${string}`;
   amount?: string;
   error?: string;
+  errorCategory?: ErrorCategory;
+  errorSeverity?: ErrorSeverity;
 }
 
 // Withdrawal status types (Stacks -> Ethereum withdrawal)
@@ -82,9 +84,12 @@ export type WithdrawStatus =
 export interface WithdrawState {
   status: WithdrawStatus;
   stacksTxId?: string;
+  ethTxHash?: `0x${string}`;
   amount?: string;
   ethRecipient?: string;
   error?: string;
+  errorCategory?: ErrorCategory;
+  errorSeverity?: ErrorSeverity;
 }
 
 // Minimum withdrawal amount (4.80 USDCx covers the fee)

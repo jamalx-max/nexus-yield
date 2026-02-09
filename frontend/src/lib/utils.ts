@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { parseError, formatErrorMessage, logError } from './error-parser'
+import type { ParsedError } from './errors'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -30,25 +32,22 @@ export function formatNumber(value: number, decimals = 2): string {
   }).format(value)
 }
 
+/**
+ * Get a friendly error message from any error object
+ * Uses the advanced error parser for categorization and enrichment
+ */
 export function getFriendlyErrorMessage(error: any): string {
-  if (!error) return 'Unknown error occurred';
-  
-  const message = error?.shortMessage || error?.message || error?.toString() || 'Unknown error occurred';
-  
-  // Common Wallet Errors
-  if (message.includes('User rejected') || message.includes('Action rejected') || message.includes('User denied')) {
-    return 'You cancelled the transaction.';
-  }
-  if (message.includes('insufficient funds') || message.includes('exceeds balance')) {
-    return 'Insufficient funds for gas or transaction.';
-  }
-  if (message.includes('Connector not connected')) {
-    return 'Wallet disconnected. Please reconnect.';
-  }
-  if (message.includes('Chain mismatch') || message.includes('network')) {
-    return 'Wrong network. Please switch to the correct chain.';
-  }
-  
-  // Truncate really long RPC errors
-  return message.length > 120 ? `${message.slice(0, 120)}...` : message;
+  const parsedError = parseError(error);
+  logError(parsedError);
+  return formatErrorMessage(parsedError);
+}
+
+/**
+ * Get the full parsed error with all details
+ * Useful when you need category, severity, and suggested actions
+ */
+export function getParsedError(error: any): ParsedError {
+  const parsedError = parseError(error);
+  logError(parsedError);
+  return parsedError;
 }

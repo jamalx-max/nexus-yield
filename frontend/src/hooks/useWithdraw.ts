@@ -8,7 +8,8 @@ import {
   type WithdrawState,
   MIN_WITHDRAW_AMOUNT,
 } from '../lib/bridge';
-import { getFriendlyErrorMessage } from '../lib/utils';
+import { getParsedError } from '../lib/utils';
+import { ERROR_MESSAGES } from '../lib/errors';
 
 export function useWithdraw() {
   const { address: ethAddress } = useAccount();
@@ -22,14 +23,59 @@ export function useWithdraw() {
    * @param ethRecipient - Optional Ethereum recipient address (defaults to connected wallet)
    */
   const withdrawToEthereum = useCallback(async (amount: string, ethRecipient?: string) => {
-    if (!stacksAddress) throw new Error('Stacks wallet not connected');
+    if (!stacksAddress) {
+      const error = new Error(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
+      setWithdrawState({ 
+        status: 'failed', 
+        error: error.message,
+        amount,
+      });
+      throw error;
+    }
     
     const recipient = ethRecipient || ethAddress;
-    if (!recipient) throw new Error('Ethereum recipient address required');
+    if (!recipient) {
+      const error = new Error(ERROR_MESSAGES.INVALID_ADDRESS);
+      setWithdrawState({ 
+        status: 'failed', 
+        error: error.message,
+        amount,
+      });
+      throw error;
+    }
 
+    // Validate amount
     const amountNum = Number(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      const error = new Error(ERROR_MESSAGES.INVALID_AMOUNT);
+      setWithdrawState({ 
+        status: 'failed', 
+        error: error.message,
+        amount,
+      });
+      throw error;
+    }
+
     if (amountNum < MIN_WITHDRAW_AMOUNT) {
-      throw new Error(`Minimum withdrawal amount is ${MIN_WITHDRAW_AMOUNT} USDCx`);
+      const error = new Error(ERROR_MESSAGES.AMOUNT_TOO_LOW);
+      setWithdrawState({ 
+        status: 'failed', 
+        error: `Minimum withdrawal amount is ${MIN_WITHDRAW_AMOUNT} USDCx`,
+        amount,
+      });
+      throw error;
+    }
+
+    // Validate Ethereum address format
+    if (!recipient.startsWith('0x') || recipient.length !== 42) {
+      const error = new Error(ERROR_MESSAGES.INVALID_ADDRESS);
+      setWithdrawState({ 
+        status: 'failed', 
+        error: 'Please enter a valid Ethereum address',
+        amount,
+        ethRecipient: recipient,
+      });
+      throw error;
     }
 
     setWithdrawState({ status: 'burning', amount, ethRecipient: recipient });
@@ -104,9 +150,12 @@ export function useWithdraw() {
 
     } catch (error: any) {
       console.error('Withdrawal failed:', error);
+      const parsedError = getParsedError(error);
       setWithdrawState({ 
         status: 'failed', 
-        error: getFriendlyErrorMessage(error),
+        error: parsedError.message,
+        errorCategory: parsedError.category,
+        errorSeverity: parsedError.severity,
         amount,
         ethRecipient: recipient,
       });
